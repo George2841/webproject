@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Scan</title>
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/scan.css">
+</head>
+<body>
+    <!-- NAVIGATION BAR -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="scan.html" class="nav-link active">Face Scan</a></li>
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                
+            </ul>
+            <div class="nav-right">
+                <span class="nav-time" id="navClock">--:--:--</span>
+                <a href="scan.html" class="btn btn-primary btn-sm">Get Started</a>
+            </div>
+            <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="index.html" class="mobile-link">Home</a>
+            <a href="scan.html" class="mobile-link active">Face Scan</a>
+            <a href="dashboard.html" class="mobile-link">Dashboard</a>
+            
+            <a href="scan.html" class="btn btn-primary" style="margin-top:8px">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- SCAN SECTION -->
+    <section class="hero">
+         <div class="scan-container">
+        <div class="camera-box">
+            <div class="camera-header">
+                <span class="camera-title">Face Scanner</span>
+                <div class="live-badge">
+                    <span class="live-dot"></span>
+                    LIVE
+                </div>
+            </div>
+            <div class="video-wrapper">
+                <video id="videoFeed" autoplay playsinline muted></video>
+                <canvas id="photoCanvas" style="display: none;"></canvas>
+                <div class="scan-overlay">
+                    <div class="scan-frame">
+                        <div class="corner corner-tl"></div>
+                        <div class="corner corner-tr"></div>
+                        <div class="corner corner-bl"></div>
+                        <div class="corner corner-br"></div>
+                    </div>
+                </div>
+                <div class="alignment-text">🎯 Center your face in the circle</div>
+                <div class="capture-btn-container">
+                    <button id="captureBtn" class="capture-btn">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
+                            <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none"/>
+                            <circle cx="12" cy="12" r="4" fill="white"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-card" id="resultCard">
+            <div class="result-title">Scan Result</div>
+            <div class="result-info">
+                <span>Status:</span>
+                <span class="status-badge status-waiting" id="scanStatus">Ready to Scan</span>
+            </div>
+            <div class="result-info" id="studentInfo" style="display: none;">
+                <span>Student:</span>
+                <span id="studentName">--</span>
+            </div>
+            <div class="result-info" id="eligibilityInfo" style="display: none;">
+                <span>Eligibility:</span>
+                <span id="eligibilityStatus">--</span>
+            </div>
+        </div>
+    </div>
+    </section>
+    <script src="js/scan.js"></script>
+</body>
+</html>

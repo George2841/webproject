@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facial Recognition</title>
+    <link rel="stylesheet" href="css/home.css">
+</head>
+<body>
+    <!-- NAVIGATION BAR-->
+    <nav class="nav-bar">
+        <div class="nav-container">
+           <ul class="nav-links">
+             <li><a href="index.html" class="nav-link active">Home</a></li>
+             <li><a href="scan.html"  class="nav-link">Face Scan</a></li>
+             <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+             <li><a href="registration.html" class="nav-link">Registration</a></li>
+           </ul>
+       <!-- Nav right -->
+         <div class="nav-right">
+             <span class="nav-time" id="navClock">--:--:--</span>
+             <a href="scan.html" class="btn btn-primary btn-sm">Get Started</a>
+         </div>
+       <!-- Mobile hamburger -->
+           <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+             <span></span><span></span><span></span>
+           </button>
+
+        </div>
+       <!-- Mobile menu -->
+     <div class="mobile-menu" id="mobileMenu">
+         <a href="index.html"     class="mobile-link active">Home</a>
+         <a href="scan.html"      class="mobile-link">Face Scan</a>
+         <a href="dashboard.html" class="mobile-link">Dashboard</a>
+         
+         <a href="scan.html"      class="btn btn-primary" style="margin-top:8px">Get Started</a>
+     </div>
+  
+    </nav>
+    <!--HERO SECTION-->
+    <section class="hero">
+    <div class="hero-container">
+
+      <!-- Left: text -->
+      <div class="hero-text">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+         <h1> Facial Recognition</h1>
+        </div>
+
+        <h3 class="hero-title">
+          Verify Students. Secure Exams.<br/>
+          
+        </h3>
+
+        <p class="hero-subtitle">
+          Our facial recognition system instantly identifies registered students
+          and checks their eligibility  by checking if they have reported, cleared fee, register units before they enter the exam hall.
+          This reduces queues,errors and no ID cards are required.
+        </p>
+
+        <div class="hero-actions">
+          <a href="scan.html" class="btn btn-primary btn-lg">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+              <path d="M9.5 6.5v3h-3v-3h3M11 5H5v6h6V5zm-1.5 9.5v3h-3v-3h3M11
+                       13H5v6h6v-6zm6.5-6.5v3h-3v-3h3M23 5h-6v6h6V5zm-6 8h1.5v1.5H17V13zm1.5
+                       1.5H20V16h-1.5v-1.5zM20 13h1.5v1.5H20V13zm-3 3h1.5v1.5H17V16zm1.5
+                       1.5H20V19h-1.5v-1.5zM20 16h1.5v1.5H20V16zm1.5 1.5H23V19h-1.5v-1.5zM23
+                       13h-1.5v1.5H23V13z"/>
+            </svg>
+            Start Face Scan
+          </a>
+          <a href="dashboard.html" class="btn btn-outline btn-lg">View Dashboard</a>
+        </div>
+
+  </section>
+  <!--FOOTER-->
+  <footer class="footer">
+    <div class="footer-container">
+
+      <div class="footer-top">
+        <!-- Brand -->
+        <div class="footer-brand">
+          
+          <p class="footer-desc">
+            Facial recognition system for secure, contactless exam
+            eligibility verification in academic institutions.
+          </p>
+        </div>
+
+        <!-- Links -->
+        <div class="footer-links-group">
+          <div class="footer-col">
+            <div class="footer-col-title">System</div>
+            <a href="scan.html"      class="footer-link">Face Scan</a>
+            <a href="dashboard.html" class="footer-link">Dashboard</a>
+            
+          </div>
+          <div class="footer-col">
+            <div class="footer-col-title">Info</div>
+            <a href="#" class="footer-link">How It Works</a>
+            <a href="#" class="footer-link">Privacy Policy</a>
+            <a href="#" class="footer-link">Support</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2024 FacialRecog System. All rights reserved.</span>
+        
+      </div>
+
+    </div>
+  </footer>
+<script src="js/home.js"></script>
+</body>
+</html>

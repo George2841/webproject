@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Facial Recognition</title>
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <!-- NAVIGATION BAR -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="scan.html" class="nav-link">Face Scan</a></li>
+                <li><a href="dashboard.html" class="nav-link active">Dashboard</a></li>
+                <li><a href="registration.html" class="nav-link">Registration</a></li>
+            </ul>
+            <div class="nav-right">
+                <span class="nav-time" id="navClock">--:--:--</span>
+                <a href="scan.html" class="btn btn-primary btn-sm">Get Started</a>
+            </div>
+            <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="index.html" class="mobile-link">Home</a>
+            <a href="scan.html" class="mobile-link">Face Scan</a>
+            <a href="dashboard.html" class="mobile-link active">Dashboard</a>
+           
+            <a href="scan.html" class="btn btn-primary" style="margin-top:8px">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- DASHBOARD SECTION -->
+    <section class="dashboard">
+        <div class="dashboard-container">
+            
+            <!-- Welcome Header -->
+            <div class="dashboard-header">
+                <h1>Student Dashboard</h1>
+                <p>Welcome back. Here's your exam eligibility overview</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="totalScans">0</span>
+                        <span class="stat-label">Total Scans</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="verifiedScans">0</span>
+                        <span class="stat-label">Verified</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">❌</div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="failedScans">0</span>
+                        <span class="stat-label">Failed</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎓</div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="eligibilityRate">0%</span>
+                        <span class="stat-label">Eligibility Rate</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Information Section -->
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2>Student Information</h2>
+                    <button class="btn btn-outline btn-sm" id="refreshBtn">Refresh</button>
+                </div>
+                <div class="student-profile">
+                    <div class="profile-card">
+                        <div class="profile-avatar">👤</div>
+                        <div class="profile-details">
+                            <h3 id="studentName">George Otieno</h3>
+                            <p id="studentId">BIT/0074/23</p>
+                            <p id="studentCourse">Information Technology</p>
+                        </div>
+                        <div class="profile-status">
+                            <span class="eligibility-badge" id="eligibilityBadge">Eligible</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exam Details Section -->
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2>Upcoming Exams</h2>
+                </div>
+                <div class="exams-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Exam Name</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Venue</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="examsList">
+                            <tr>
+                                <td>BIT3110 - Database Analysis</td>
+                                <td>Dec 15, 2024</td>
+                                <td>9:00 AM - 12:00 PM</td>
+                                <td>ABB302</td>
+                                <td><span class="status-badge status-upcoming">Upcoming</span></td>
+                            </tr>
+                            <tr>
+                                <td>BIT3120 - Web Technologies</td>
+                                <td>Dec 18, 2024</td>
+                                <td>2:00 PM - 5:00 PM</td>
+                                <td>ABB 203</td>
+                                <td><span class="status-badge status-upcoming">Upcoming</span></td>
+                            </tr>
+                            <tr>
+                                <td>BIT3160 - Object-Oriented Programming</td>
+                                <td>Dec 20, 2024</td>
+                                <td>10:00 AM - 1:00 PM</td>
+                                <td>ABB 203</td>
+                                <td><span class="status-badge status-upcoming">Upcoming</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Scans Section -->
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2>Recent Scan History</h2>
+                </div>
+                <div class="scans-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scansList">
+                            <tr>
+                                <td colspan="4" style="text-align: center;">No scan history available</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <p class="footer-desc">
+                        Facial recognition system for secure, contactless exam
+                        eligibility verification in academic institutions.
+                    </p>
+                </div>
+                <div class="footer-links-group">
+                    <div class="footer-col">
+                        <div class="footer-col-title">System</div>
+                        <a href="scan.html" class="footer-link">Face Scan</a>
+                        <a href="dashboard.html" class="footer-link">Dashboard</a>
+                        
+                    </div>
+                    <div class="footer-col">
+                        <div class="footer-col-title">Info</div>
+                        <a href="#" class="footer-link">How It Works</a>
+                        <a href="#" class="footer-link">Privacy Policy</a>
+                        <a href="#" class="footer-link">Support</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2024 FacialRecog System. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

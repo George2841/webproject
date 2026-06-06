@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+    <link rel="stylesheet" href="css/registration.css">
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="scan.html" class="nav-link">Face Scan</a></li>
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li><a href="registration.html" class="nav-link active">Registration</a></li>
+            </ul>
+            <!-- Nav right -->
+            <div class="nav-right">
+                <span class="nav-time" id="navClock">--:--:--</span>
+                <a href="scan.html" class="btn btn-primary btn-sm">Get Started</a>
+            </div>
+            <!-- Mobile hamburger -->
+            <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+        <!-- Mobile menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="index.html" class="mobile-link">Home</a>
+            <a href="scan.html" class="mobile-link">Face Scan</a>
+            <a href="dashboard.html" class="mobile-link">Dashboard</a>
+            <a href="registration.html" class="mobile-link">Registration</a>
+            <a href="scan.html" class="btn btn-primary" style="margin-top:8px">Get Started</a>
+        </div>
+    </nav>
+
+    <div class="registration-container">
+        <div class="card">
+            <div class="card-header">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                </div>
+                <h1>Student Registration</h1>
+                <p>Register for Facial Recognition Examination System</p>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                Registration successful! Redirecting to scan page...
+            </div>
+
+            <form id="regForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>First Name <span class="required">*</span></label>
+                        <input type="text" id="firstName" placeholder="Enter First Name">
+                        <div class="error-message" id="firstNameError">First name is required</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Last Name <span class="required">*</span></label>
+                        <input type="text" id="lastName" placeholder="Enter Last Name">
+                        <div class="error-message" id="lastNameError">Last name is required</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Registration Number <span class="required">*</span></label>
+                    <input type="text" id="regNumber" placeholder="Enter Registration Number">
+                    <div class="error-message" id="regNumberError">Registration number is required</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Student Email <span class="required">*</span></label>
+                    <input type="email" id="studentEmail" placeholder="you@example.com">
+                    <div class="error-message" id="studentEmailError">Valid email is required</div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Department <span class="required">*</span></label>
+                        <input type="text" id="department" placeholder="Enter Department Name">
+                        <div class="error-message" id="departmentError">Department is required</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Year of Study <span class="required">*</span></label>
+                        <select id="yearOfStudy">
+                            <option value="">Select Year</option>
+                            <option value="Year 1">Year 1</option>
+                            <option value="Year 2">Year 2</option>
+                            <option value="Year 3">Year 3</option>
+                            <option value="Year 4">Year 4</option>
+                        </select>
+                        <div class="error-message" id="yearError">Please select year of study</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Faculty <span class="required">*</span></label>
+                        <input type="text" id="faculty" placeholder="Enter Faculty Name">
+                        <div class="error-message" id="facultyError">Faculty is required</div>
+                    </div>
+                </div>
+
+                <a href="scan.html" class="register-btn">Proceed to Face Scan</a>
+
+                <div class="login-link">
+                    <a href="login.html">Already have an account? Login here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
