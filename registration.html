@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration</title>
+    
     <link rel="stylesheet" href="css/registration.css">
 </head>
 <body>
@@ -13,27 +14,22 @@
                 <li><a href="index.html" class="nav-link">Home</a></li>
                 <li><a href="scan.html" class="nav-link">Face Scan</a></li>
                 <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
-                <li><a href="registration.html" class="nav-link active">Registration</a></li>
+                <li><a href="registration.html" class="nav-link active">Registration</a></li> 
+                     
             </ul>
-            <!-- Nav right -->
             <div class="nav-right">
                 <span class="nav-time" id="navClock">--:--:--</span>
-                <a href="scan.html" class="btn btn-primary btn-sm">Get Started</a>
             </div>
-            <!-- Mobile hamburger -->
             <button class="hamburger" id="hamburger" onclick="toggleMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span></span><span></span><span></span>
             </button>
         </div>
-        <!-- Mobile menu -->
         <div class="mobile-menu" id="mobileMenu">
-            <a href="index.html" class="mobile-link">Home</a>
-            <a href="scan.html" class="mobile-link">Face Scan</a>
-            <a href="dashboard.html" class="mobile-link">Dashboard</a>
-            <a href="registration.html" class="mobile-link">Registration</a>
-            <a href="scan.html" class="btn btn-primary" style="margin-top:8px">Get Started</a>
+            <a href="index.html">Home</a>
+            <a href="scan.html">Face Scan</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="registration.html">Registration</a>
+            <a href="capture.html">Face Capture</a>
         </div>
     </nav>
 
@@ -50,7 +46,7 @@
             </div>
 
             <div class="success-message" id="successMessage">
-                Registration successful! Redirecting to scan page...
+             Registration details saved! Redirecting to face capture...
             </div>
 
             <form id="regForm">
@@ -100,21 +96,19 @@
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Faculty <span class="required">*</span></label>
-                        <input type="text" id="faculty" placeholder="Enter Faculty Name">
-                        <div class="error-message" id="facultyError">Faculty is required</div>
-                    </div>
+                <div class="form-group">
+                    <label>Faculty <span class="required">*</span></label>
+                    <input type="text" id="faculty" placeholder="Enter Faculty Name">
+                    <div class="error-message" id="facultyError">Faculty is required</div>
                 </div>
 
-                <a href="scan.html" class="register-btn">Proceed to Face Scan</a>
+                <button type="submit" class="next-btn" id="registerBtn">Next</button>
 
-                <div class="login-link">
-                    <a href="login.html">Already have an account? Login here</a>
-                </div>
+                
             </form>
         </div>
     </div>
+
+    <script src="js/registration.js"></script>
 </body>
 </html>

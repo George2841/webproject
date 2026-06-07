@@ -1,5 +1,3 @@
-/*SCAN PAGE STYLES*/
-/* Same styling as home page */
 
 * {
     margin: 0;
@@ -82,7 +80,6 @@ body {
     border-radius: 8px;
 }
 
-
 .btn {
     text-decoration: none;
     padding: 8px 20px;
@@ -151,168 +148,124 @@ body {
     border-bottom: none;
 }
 
-/*HERO SECTION*/
-.hero {
-    padding: 40px 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: calc(100vh - 80px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/*SCAN CONTAINER*/
-.scan-container {
-    max-width: 900px;
+/*CAPTURE CONTAINER*/
+.capture-container {
+    max-width: 800px;
     width: 100%;
-    margin: 0 auto;
+    margin: 40px auto;
+    padding: 0 20px;
 }
 
-/*REGISTRATION NUMBER INPUT SECTION*/
-.reg-input-container {
+/*CARD STYLES*/
+.card {
     background: white;
     border-radius: 24px;
-    padding: 20px 24px;
-    margin-bottom: 24px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/*CARD HEADER*/
+.card-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.card-header h1 {
+    font-size: 28px;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+}
+
+.card-header p {
+    color: #666;
+    font-size: 14px;
+}
+
+.logo-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+}
+
+.logo-icon svg {
+    width: 35px;
+    height: 35px;
+    fill: white;
+}
+
+/*STUDENT INFO CARD */
+.student-info-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
     border: 1px solid #e8e8e8;
 }
 
-.reg-input-wrapper {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.reg-input-wrapper label {
-    font-weight: 600;
-    color: #333;
-    font-size: 14px;
-}
-
-.reg-input-wrapper input {
-    flex: 1;
-    padding: 12px 16px;
-    border: 2px solid #e0e0e0;
-    border-radius: 12px;
-    font-size: 14px;
-    font-family: inherit;
-    transition: all 0.3s ease;
-    outline: none;
-    min-width: 220px;
-    background: white;
-}
-
-.reg-input-wrapper input:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.reg-input-wrapper input.error {
-    border-color: #dc2626;
-}
-
-.verify-reg-btn {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    padding: 12px 28px;
-    border: none;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.verify-reg-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-}
-
-.verify-reg-btn:active {
-    transform: translateY(0);
-}
-
-.reg-error-message {
-    color: #dc2626;
-    font-size: 12px;
-    margin-top: 10px;
-    display: none;
-}
-
-.reg-error-message.show {
-    display: block;
-}
-
-.reg-success-message {
-    color: #059669;
-    font-size: 12px;
-    margin-top: 10px;
-    display: none;
-}
-
-.reg-success-message.show {
-    display: block;
-}
-
-.student-name-display {
-    background: #f8f9fa;
-    padding: 12px 16px;
-    border-radius: 12px;
-    margin-top: 12px;
-    display: none;
-    font-size: 14px;
-    border-left: 3px solid #667eea;
-}
-
-.student-name-display.show {
-    display: block;
-}
-
-.student-name-display span:first-child {
+.student-info-card .label {
     font-weight: 600;
     color: #667eea;
 }
 
-.student-name-display span:last-child {
+.student-info-card .value {
     color: #333;
     font-weight: 500;
 }
 
 /*CAMERA BOX*/
 .camera-box {
-    background: white;
-    border-radius: 24px;
+    background: #1a1a2e;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
 
 .camera-header {
-    padding: 18px 24px;
-    background: white;
-    border-bottom: 1px solid #e0e0e0;
+    padding: 15px 20px;
+    background: #16213e;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .camera-title {
-    color: #1a1a2e;
-    font-size: 18px;
+    color: white;
+    font-size: 16px;
     font-weight: 600;
 }
 
 .live-badge {
     background: #dc2626;
     color: white;
-    padding: 5px 14px;
-    border-radius: 30px;
-    font-size: 12px;
-    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     animation: pulse 1.5s infinite;
 }
 
@@ -338,7 +291,7 @@ body {
 .video-wrapper {
     position: relative;
     background: #000;
-    min-height: 450px;
+    min-height: 400px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -409,44 +362,6 @@ body {
     }
 }
 
-/* Corner markers */
-.scan-frame .corner {
-    position: absolute;
-    width: 28px;
-    height: 28px;
-    border-color: #2196f3;
-    border-style: solid;
-    border-width: 0;
-}
-
-.scan-frame .corner-tl {
-    top: -4px;
-    left: -4px;
-    border-top-width: 3px;
-    border-left-width: 3px;
-}
-
-.scan-frame .corner-tr {
-    top: -4px;
-    right: -4px;
-    border-top-width: 3px;
-    border-right-width: 3px;
-}
-
-.scan-frame .corner-bl {
-    bottom: -4px;
-    left: -4px;
-    border-bottom-width: 3px;
-    border-left-width: 3px;
-}
-
-.scan-frame .corner-br {
-    bottom: -4px;
-    right: -4px;
-    border-bottom-width: 3px;
-    border-right-width: 3px;
-}
-
 .alignment-text {
     position: absolute;
     bottom: 80px;
@@ -456,8 +371,8 @@ body {
     font-size: 14px;
     font-weight: 500;
     background: rgba(0, 0, 0, 0.75);
-    padding: 8px 20px;
-    border-radius: 40px;
+    padding: 6px 16px;
+    border-radius: 25px;
     font-family: 'Poppins', sans-serif;
     z-index: 20;
     white-space: nowrap;
@@ -468,7 +383,7 @@ body {
 /*CAPTURE BUTTON*/
 .capture-btn-container {
     position: absolute;
-    bottom: 25px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 20;
@@ -476,8 +391,8 @@ body {
 }
 
 .capture-btn {
-    width: 75px;
-    height: 75px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     background: linear-gradient(135deg, #667eea, #764ba2);
     border: 4px solid white;
@@ -499,71 +414,141 @@ body {
     transform: scale(0.95);
 }
 
-/*RESULT CARD*/
-.result-card {
-    background: white;
-    border-radius: 20px;
-    padding: 24px;
-    margin-top: 24px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e8e8e8;
-}
-
-.result-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 18px;
-    color: #1a1a2e;
-    border-bottom: 2px solid #667eea;
-    padding-bottom: 10px;
-}
-
-.result-info {
+/*ACTION BUTTONS*/
+.action-buttons {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px;
-    font-size: 15px;
+    gap: 15px;
+    margin-top: 20px;
 }
 
-.result-info span:first-child {
-    color: #666;
+.btn-capture {
+    flex: 1;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-capture:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-retake {
+    flex: 1;
+    background: #f0f2f5;
+    color: #333;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-retake:hover {
+    background: #e0e0e0;
+    transform: translateY(-2px);
+}
+
+.btn-finish {
+    width: 100%;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+    display: none;
+}
+
+.btn-finish:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(34, 197, 94, 0.4);
+}
+
+.btn-finish:active {
+    transform: translateY(0);
+}
+
+.btn-finish:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/*CAPTURED PREVIEW*/
+.captured-preview {
+    display: none;
+    margin-top: 20px;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.captured-preview p {
+    margin-bottom: 8px;
+    color: #333;
     font-weight: 500;
 }
 
-.result-info span:last-child {
-    color: #333;
-    font-weight: 600;
+.captured-preview img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #22c55e;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.status-badge {
-    padding: 6px 18px;
-    border-radius: 30px;
-    font-size: 13px;
-    font-weight: 600;
+/*MESSAGE STYLES*/
+.message {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+    display: none;
+    font-size: 14px;
+    font-weight: 500;
 }
 
-.status-waiting {
-    background: #fff3e0;
-    color: #ed6c02;
+.message.success {
+    background: #d1fae5;
+    color: #059669;
+    display: block;
 }
 
-.status-success {
-    background: #e8f5e9;
-    color: #2e7d32;
+.message.error {
+    background: #fee2e2;
+    color: #dc2626;
+    display: block;
 }
 
-.status-error {
-    background: #ffebee;
-    color: #d32f2f;
+.message.info {
+    background: #e0f2fe;
+    color: #0284c7;
+    display: block;
+}
+
+/*INFO TEXT*/
+.info-text {
+    font-size: 12px;
+    color: #888;
+    text-align: center;
+    margin-top: 15px;
 }
 
 /*RESPONSIVE DESIGN*/
 @media (max-width: 768px) {
-    .hero {
-        padding: 20px;
-    }
-    
     .nav-links {
         display: none;
     }
@@ -579,113 +564,119 @@ body {
     .nav-container {
         padding: 15px 20px;
     }
-    
-    .reg-input-wrapper {
-        flex-direction: column;
-        align-items: stretch;
+
+    .capture-container {
+        margin: 20px auto;
+        padding: 0 15px;
     }
-    
-    .verify-reg-btn {
-        width: 100%;
+
+    .card {
+        padding: 25px;
     }
-    
-    .reg-input-wrapper input {
-        width: 100%;
+
+    .card-header h1 {
+        font-size: 22px;
     }
-    
+
+    .card-header p {
+        font-size: 12px;
+    }
+
     .scan-frame {
         width: 240px;
         height: 240px;
     }
-    
+
     .capture-btn {
-        width: 65px;
-        height: 65px;
+        width: 60px;
+        height: 60px;
     }
-    
+
+    .capture-btn svg {
+        width: 24px;
+        height: 24px;
+    }
+
     .alignment-text {
         font-size: 12px;
         bottom: 70px;
         white-space: nowrap;
-        padding: 6px 16px;
+        padding: 5px 12px;
     }
-    
-    .camera-header {
-        padding: 14px 20px;
+
+    .student-info-card {
+        flex-direction: column;
+        text-align: center;
+        font-size: 13px;
     }
-    
-    .camera-title {
-        font-size: 16px;
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 10px;
     }
-    
-    .result-card {
-        padding: 18px;
+
+    .btn-capture, .btn-retake {
+        padding: 12px;
+        font-size: 14px;
     }
-    
-    .result-info {
+
+    .btn-finish {
+        padding: 12px;
         font-size: 14px;
     }
 }
 
 @media (max-width: 480px) {
-    .hero {
-        padding: 15px;
+    .capture-container {
+        margin: 15px auto;
     }
-    
-    .reg-input-container {
-        padding: 15px;
+
+    .card {
+        padding: 20px;
     }
-    
+
+    .card-header h1 {
+        font-size: 18px;
+    }
+
     .scan-frame {
         width: 200px;
         height: 200px;
     }
-    
+
     .capture-btn {
         width: 55px;
         height: 55px;
     }
-    
-    .capture-btn svg {
-        width: 24px;
-        height: 24px;
-    }
-    
+
     .alignment-text {
         font-size: 10px;
         bottom: 65px;
-        padding: 5px 12px;
     }
-    
-    .camera-header {
-        padding: 12px 16px;
+
+    .captured-preview img {
+        width: 100px;
+        height: 100px;
     }
-    
-    .camera-title {
-        font-size: 14px;
-    }
-    
-    .live-badge {
+
+    .info-text {
         font-size: 10px;
-        padding: 4px 10px;
     }
-    
-    .result-card {
-        padding: 15px;
-    }
-    
-    .result-title {
-        font-size: 16px;
-        margin-bottom: 14px;
-    }
-    
-    .result-info {
-        font-size: 13px;
-        margin-bottom: 10px;
-    }
-    
-    .status-badge {
-        padding: 4px 12px;
-        font-size: 11px;
-    }
+}
+
+/*UTILITY CLASSES*/
+.text-center {
+    text-align: center;
+}
+
+.mt-10 {
+    margin-top: 10px;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.hidden {
+    display: none;
 }

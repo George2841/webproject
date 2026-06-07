@@ -1,4 +1,4 @@
-/* ========== RESET & BASE STYLES ========== */
+/*RESET & BASE STYLE*/
 * {
     margin: 0;
     padding: 0;
@@ -14,13 +14,12 @@ body {
     flex-direction: column;
 }
 
-/* ========== TYPOGRAPHY ========== */
+/*TYPOGRAPHY */
 h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     line-height: 1.2;
 }
-
-/* ========== NAVIGATION BAR ========== */
+/*NAVIGATION BAR*/
 .nav-bar {
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(10px);
@@ -89,7 +88,7 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: 8px;
 }
 
-/* ========== BUTTON STYLES ========== */
+/*BUTTON STYLES*/
 .btn {
     display: inline-flex;
     align-items: center;
@@ -137,7 +136,7 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1rem;
 }
 
-/* ========== HAMBURGER MENU ========== */
+/*HAMBURGER MENU*/
 .hamburger {
     display: none;
     background: none;
@@ -178,7 +177,7 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
 }
 
-/* ========== HERO SECTION ========== */
+/*HERO SECTION*/
 .hero {
     padding: 4rem 2rem;
     min-height: calc(100vh - 80px);
@@ -259,7 +258,7 @@ h1, h2, h3, h4, h5, h6 {
     justify-content: center;
 }
 
-/* ========== FOOTER STYLES ========== */
+/*FOOTER STYLES*/
 .footer {
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(10px);
@@ -340,8 +339,8 @@ h1, h2, h3, h4, h5, h6 {
     font-family: 'Courier New', monospace;
 }
 
-/* ========== TOAST NOTIFICATIONS (Optional) ========== */
-.toast-notification {
+/*Toast-notification*/
+ .toast-notification {
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -375,7 +374,7 @@ h1, h2, h3, h4, h5, h6 {
     to { transform: translateX(0); opacity: 1; }
 }
 
-/* ========== RESPONSIVE DESIGN ========== */
+/*RESPONSIVE DESIGN*/
 @media (max-width: 968px) {
     .hero-title {
         font-size: 2rem;
@@ -453,5 +452,8 @@ h1, h2, h3, h4, h5, h6 {
     .btn-lg {
         padding: 0.75rem 1.5rem;
         font-size: 0.875rem;
+    }
+    .float-tag {
+        display: none;
     }
 }

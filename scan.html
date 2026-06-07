@@ -15,11 +15,11 @@
                 <li><a href="index.html" class="nav-link">Home</a></li>
                 <li><a href="scan.html" class="nav-link active">Face Scan</a></li>
                 <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
-                
+                <li><a href="registration.html" class="nav-link">Registration</a></li>
             </ul>
             <div class="nav-right">
                 <span class="nav-time" id="navClock">--:--:--</span>
-                <a href="scan.html" class="btn btn-primary btn-sm">Get Started</a>
+                
             </div>
             <button class="hamburger" id="hamburger" onclick="toggleMenu()">
                 <span></span><span></span><span></span>
@@ -29,61 +29,75 @@
             <a href="index.html" class="mobile-link">Home</a>
             <a href="scan.html" class="mobile-link active">Face Scan</a>
             <a href="dashboard.html" class="mobile-link">Dashboard</a>
-            
-            <a href="scan.html" class="btn btn-primary" style="margin-top:8px">Get Started</a>
+            <a href="registration.html" class="mobile-link">Registration</a>
         </div>
     </nav>
 
     <!-- SCAN SECTION -->
     <section class="hero">
-         <div class="scan-container">
-        <div class="camera-box">
-            <div class="camera-header">
-                <span class="camera-title">Face Scanner</span>
-                <div class="live-badge">
-                    <span class="live-dot"></span>
-                    LIVE
+        <div class="scan-container">
+            <!--Registration Number Input Section -->
+            <div class="reg-input-container">
+                <div class="reg-input-wrapper">
+                    <label>Registration Number:</label>
+                    <input type="text" id="regNumberInput" placeholder="Enter your Registration Number">
+                    <button id="verifyRegBtn" class="verify-reg-btn">Verify Student</button>
+                </div>
+                <div id="regErrorMsg" class="reg-error-message">Student not found. Please register first.</div>
+                <div id="regSuccessMsg" class="reg-success-message">Student verified successfully!</div>
+                <div id="studentNameDisplay" class="student-name-display">
+                    <span>👤 Student:</span>
+                    <span id="verifiedStudentName">--</span>
                 </div>
             </div>
-            <div class="video-wrapper">
-                <video id="videoFeed" autoplay playsinline muted></video>
-                <canvas id="photoCanvas" style="display: none;"></canvas>
-                <div class="scan-overlay">
-                    <div class="scan-frame">
-                        <div class="corner corner-tl"></div>
-                        <div class="corner corner-tr"></div>
-                        <div class="corner corner-bl"></div>
-                        <div class="corner corner-br"></div>
+
+            <div class="camera-box">
+                <div class="camera-header">
+                    <span class="camera-title">Face Scanner</span>
+                    <div class="live-badge">
+                        <span class="live-dot"></span>
+                        LIVE
                     </div>
                 </div>
-                <div class="alignment-text">🎯 Center your face in the circle</div>
-                <div class="capture-btn-container">
-                    <button id="captureBtn" class="capture-btn">
-                        <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
-                            <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none"/>
-                            <circle cx="12" cy="12" r="4" fill="white"/>
-                        </svg>
-                    </button>
+                <div class="video-wrapper">
+                    <video id="videoFeed" autoplay playsinline muted></video>
+                    <canvas id="photoCanvas" style="display: none;"></canvas>
+                    <div class="scan-overlay">
+                        <div class="scan-frame">
+                            <div class="corner corner-tl"></div>
+                            <div class="corner corner-tr"></div>
+                            <div class="corner corner-bl"></div>
+                            <div class="corner corner-br"></div>
+                        </div>
+                    </div>
+                    <div class="alignment-text">Center your face in the circle</div>
+                    <div class="capture-btn-container">
+                        <button id="captureBtn" class="capture-btn">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
+                                <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none"/>
+                                <circle cx="12" cy="12" r="4" fill="white"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-card" id="resultCard">
+                <div class="result-title">Scan Result</div>
+                <div class="result-info">
+                    <span>Status:</span>
+                    <span class="status-badge status-waiting" id="scanStatus">Ready to Scan</span>
+                </div>
+                <div class="result-info" id="studentInfo" style="display: none;">
+                    <span>Student:</span>
+                    <span id="studentName">--</span>
+                </div>
+                <div class="result-info" id="eligibilityInfo" style="display: none;">
+                    <span>Eligibility:</span>
+                    <span id="eligibilityStatus">--</span>
                 </div>
             </div>
         </div>
-
-        <div class="result-card" id="resultCard">
-            <div class="result-title">Scan Result</div>
-            <div class="result-info">
-                <span>Status:</span>
-                <span class="status-badge status-waiting" id="scanStatus">Ready to Scan</span>
-            </div>
-            <div class="result-info" id="studentInfo" style="display: none;">
-                <span>Student:</span>
-                <span id="studentName">--</span>
-            </div>
-            <div class="result-info" id="eligibilityInfo" style="display: none;">
-                <span>Eligibility:</span>
-                <span id="eligibilityStatus">--</span>
-            </div>
-        </div>
-    </div>
     </section>
     <script src="js/scan.js"></script>
 </body>

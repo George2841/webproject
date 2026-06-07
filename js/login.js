@@ -1,4 +1,4 @@
-// ========== LOGIN WITH EMAIL AND PASSWORD ==========
+//LOGIN WITH EMAIL AND PASSWORD
 
 // Get DOM elements
 const loginForm = document.getElementById('loginForm');
@@ -76,7 +76,7 @@ loginForm.addEventListener('submit', async (e) => {
     
     
     
-    // ========== OPTION 2: Real Backend API (Uncomment this and comment OPTION 1) ==========
+    //Real Backend API
     
     try {
         const response = await fetch('https://your-backend-api.com/api/login', {

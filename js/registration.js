@@ -1,17 +1,17 @@
-
+//REGISTRATION PAGE JAVASCRIPT
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
     
-    //CLOCK FUNCTIONALITY
+    // ========== CLOCK FUNCTIONALITY ==========
     function updateClock() {
-        const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        const timeString = `${hours}:${minutes}:${seconds}`;
+        var now = new Date();
+        var hours = String(now.getHours()).padStart(2, '0');
+        var minutes = String(now.getMinutes()).padStart(2, '0');
+        var seconds = String(now.getSeconds()).padStart(2, '0');
+        var timeString = hours + ':' + minutes + ':' + seconds;
         
-        const navClock = document.getElementById('navClock');
+        var navClock = document.getElementById('navClock');
         if (navClock) {
             navClock.textContent = timeString;
         }
@@ -21,23 +21,18 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(updateClock, 1000);
     updateClock();
     
-    //MOBILE MENU TOGGLE
+    // ========== MOBILE MENU TOGGLE ==========
     window.toggleMenu = function() {
-        const mobileMenu = document.getElementById('mobileMenu');
-        const hamburger = document.getElementById('hamburger');
-        
+        var mobileMenu = document.getElementById('mobileMenu');
         if (mobileMenu) {
             mobileMenu.classList.toggle('show');
-        }
-        if (hamburger) {
-            hamburger.classList.toggle('active');
         }
     }
     
     // Close mobile menu when clicking outside
     document.addEventListener('click', function(event) {
-        const mobileMenu = document.getElementById('mobileMenu');
-        const hamburger = document.getElementById('hamburger');
+        var mobileMenu = document.getElementById('mobileMenu');
+        var hamburger = document.getElementById('hamburger');
         
         if (mobileMenu && mobileMenu.classList.contains('show')) {
             if (hamburger && !hamburger.contains(event.target) && !mobileMenu.contains(event.target)) {
@@ -46,45 +41,85 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    //GET DOM ELEMENTS
-    const regForm = document.getElementById('regForm');
-    const firstName = document.getElementById('firstName');
-    const lastName = document.getElementById('lastName');
-    const regNumber = document.getElementById('regNumber');
-    const studentEmail = document.getElementById('studentEmail');
-    const department = document.getElementById('department');
-    const yearOfStudy = document.getElementById('yearOfStudy');
-    const faculty = document.getElementById('faculty');
-    const successMessage = document.getElementById('successMessage');
+    // ========== GET DOM ELEMENTS ==========
+    var regForm = document.getElementById('regForm');
+    var firstName = document.getElementById('firstName');
+    var lastName = document.getElementById('lastName');
+    var regNumber = document.getElementById('regNumber');
+    var studentEmail = document.getElementById('studentEmail');
+    var department = document.getElementById('department');
+    var yearOfStudy = document.getElementById('yearOfStudy');
+    var faculty = document.getElementById('faculty');
+    var registerBtn = document.getElementById('registerBtn');
+    var successMessage = document.getElementById('successMessage');
     
-    //HELPER FUNCTIONS
+    // ========== VALIDATION FUNCTIONS ==========
     
     // Email validation using regex
     function validateEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
     
-    // Clear error on input
+    // Registration number validation
+    // Accepts formats like: BIT/0074/23, CS/2024/001, BIT-0074-23, BIT007423, etc.
+    function validateRegNumber(regNo) {
+        // Regex explanation:
+        // ^ - start of string
+        // [A-Za-z]{2,4} - 2 to 4 letters (course code like BIT, CS, ENG)
+        // [\/\-]? - optional slash or dash separator
+        // [0-9]{2,4} - 2 to 4 digits (year or number like 0074, 2024)
+        // [\/\-]? - optional slash or dash separator
+        // [0-9]{2,4}$ - 2 to 4 digits at the end (like 23, 001, 2024)
+        
+        var regRegex = /^[A-Za-z]{2,4}[\/\-]?[0-9]{2,4}[\/\-]?[0-9]{2,4}$/;
+        return regRegex.test(regNo);
+    }
+    
+    // Name validation (letters only)
+    function validateName(name) {
+        var nameRegex = /^[A-Za-z\s]{2,50}$/;
+        return nameRegex.test(name);
+    }
+    
+    // ========== ERROR HANDLING FUNCTIONS ==========
+    
+    function showError(inputElement, errorElement, message) {
+        if (inputElement) inputElement.classList.add('error');
+        if (errorElement) {
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+    }
+    
+    function hideError(inputElement, errorElement) {
+        if (inputElement) inputElement.classList.remove('error');
+        if (errorElement) errorElement.classList.remove('show');
+    }
+    
+    function showSuccessMessage(message) {
+        if (successMessage) {
+            successMessage.textContent = message;
+            successMessage.classList.add('show');
+        }
+    }
+    
+    // ========== CLEAR ERRORS ON INPUT ==========
+    
     function clearErrorOnInput(inputId, errorId) {
-        const input = document.getElementById(inputId);
-        const error = document.getElementById(errorId);
+        var input = document.getElementById(inputId);
+        var error = document.getElementById(errorId);
         if (input && error) {
             input.addEventListener('input', function() {
                 input.classList.remove('error');
                 error.classList.remove('show');
-                // Reset error message text
-                if (inputId === 'studentEmail') {
-                    error.textContent = 'Valid email is required';
-                }
             });
         }
     }
     
-    // Clear error on select dropdown
     function clearSelectError(selectId, errorId) {
-        const select = document.getElementById(selectId);
-        const error = document.getElementById(errorId);
+        var select = document.getElementById(selectId);
+        var error = document.getElementById(errorId);
         if (select && error) {
             select.addEventListener('change', function() {
                 select.classList.remove('error');
@@ -93,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Clear error on all inputs
+    // Setup clear error listeners for all fields
     clearErrorOnInput('firstName', 'firstNameError');
     clearErrorOnInput('lastName', 'lastNameError');
     clearErrorOnInput('regNumber', 'regNumberError');
@@ -102,249 +137,160 @@ document.addEventListener('DOMContentLoaded', function() {
     clearErrorOnInput('faculty', 'facultyError');
     clearSelectError('yearOfStudy', 'yearError');
     
-    //FORM VALIDATION FUNCTION
+    // ========== CHECK FOR DUPLICATE STUDENT ==========
+    function isDuplicateStudent(email, regNum) {
+        var students = JSON.parse(localStorage.getItem('students') || '[]');
+        for (var i = 0; i < students.length; i++) {
+            if (students[i].email === email || students[i].regNumber === regNum) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    // ========== SAVE STUDENT DATA AND REDIRECT ==========
+    function saveAndRedirect(studentData) {
+        // Save temporary student data to localStorage
+        localStorage.setItem('tempStudentData', JSON.stringify(studentData));
+        console.log('Data saved to localStorage:', studentData);
+        
+        // Show success message
+        showSuccessMessage('✅ Registration details saved! Redirecting to face capture...');
+        
+        // Disable button to prevent multiple clicks
+        if (registerBtn) {
+            registerBtn.disabled = true;
+            registerBtn.textContent = 'Redirecting...';
+        }
+        
+        // Redirect to face capture page after 1.5 seconds
+        setTimeout(function() {
+            window.location.href = 'capture.html';
+        }, 1500);
+    }
+    
+    // ========== VALIDATE ENTIRE FORM ==========
     function validateForm() {
-        let isValid = true;
+        var isValid = true;
         
         // Get values
-        const firstNameVal = firstName.value.trim();
-        const lastNameVal = lastName.value.trim();
-        const regNumberVal = regNumber.value.trim();
-        const emailVal = studentEmail.value.trim();
-        const departmentVal = department.value.trim();
-        const yearVal = yearOfStudy.value;
-        const facultyVal = faculty.value.trim();
+        var firstNameVal = firstName.value.trim();
+        var lastNameVal = lastName.value.trim();
+        var regNumberVal = regNumber.value.trim();
+        var emailVal = studentEmail.value.trim();
+        var departmentVal = department.value.trim();
+        var yearVal = yearOfStudy.value;
+        var facultyVal = faculty.value.trim();
         
         // Validate First Name
         if (!firstNameVal) {
-            firstName.classList.add('error');
-            const firstNameError = document.getElementById('firstNameError');
-            firstNameError.textContent = 'First name is required';
-            firstNameError.classList.add('show');
+            showError(firstName, document.getElementById('firstNameError'), 'First name is required');
             isValid = false;
-        } else if (firstNameVal.length < 2) {
-            firstName.classList.add('error');
-            const firstNameError = document.getElementById('firstNameError');
-            firstNameError.textContent = 'First name must be at least 2 characters';
-            firstNameError.classList.add('show');
+        } else if (!validateName(firstNameVal)) {
+            showError(firstName, document.getElementById('firstNameError'), 'First name must contain only letters (minimum 2 characters)');
             isValid = false;
+        } else {
+            hideError(firstName, document.getElementById('firstNameError'));
         }
         
         // Validate Last Name
         if (!lastNameVal) {
-            lastName.classList.add('error');
-            const lastNameError = document.getElementById('lastNameError');
-            lastNameError.textContent = 'Last name is required';
-            lastNameError.classList.add('show');
+            showError(lastName, document.getElementById('lastNameError'), 'Last name is required');
             isValid = false;
-        } else if (lastNameVal.length < 2) {
-            lastName.classList.add('error');
-            const lastNameError = document.getElementById('lastNameError');
-            lastNameError.textContent = 'Last name must be at least 2 characters';
-            lastNameError.classList.add('show');
+        } else if (!validateName(lastNameVal)) {
+            showError(lastName, document.getElementById('lastNameError'), 'Last name must contain only letters (minimum 2 characters)');
             isValid = false;
+        } else {
+            hideError(lastName, document.getElementById('lastNameError'));
         }
         
         // Validate Registration Number
         if (!regNumberVal) {
-            regNumber.classList.add('error');
-            const regNumberError = document.getElementById('regNumberError');
-            regNumberError.textContent = 'Registration number is required';
-            regNumberError.classList.add('show');
+            showError(regNumber, document.getElementById('regNumberError'), 'Registration number is required');
             isValid = false;
-        } else if (regNumberVal.length < 5) {
-            regNumber.classList.add('error');
-            const regNumberError = document.getElementById('regNumberError');
-            regNumberError.textContent = 'Please enter a valid registration number';
-            regNumberError.classList.add('show');
+        } else if (!validateRegNumber(regNumberVal)) {
+            showError(regNumber, document.getElementById('regNumberError'), 'Please enter a valid registration number (e.g., BIT/0074/23, CS/2024/001)');
             isValid = false;
+        } else {
+            hideError(regNumber, document.getElementById('regNumberError'));
         }
         
         // Validate Email
         if (!emailVal) {
-            studentEmail.classList.add('error');
-            const emailError = document.getElementById('studentEmailError');
-            emailError.textContent = 'Email address is required';
-            emailError.classList.add('show');
+            showError(studentEmail, document.getElementById('studentEmailError'), 'Email address is required');
             isValid = false;
         } else if (!validateEmail(emailVal)) {
-            studentEmail.classList.add('error');
-            const emailError = document.getElementById('studentEmailError');
-            emailError.textContent = 'Please enter a valid email address (e.g., name@example.com)';
-            emailError.classList.add('show');
+            showError(studentEmail, document.getElementById('studentEmailError'), 'Please enter a valid email address');
             isValid = false;
+        } else {
+            hideError(studentEmail, document.getElementById('studentEmailError'));
         }
         
         // Validate Department
         if (!departmentVal) {
-            department.classList.add('error');
-            const departmentError = document.getElementById('departmentError');
-            departmentError.textContent = 'Department is required';
-            departmentError.classList.add('show');
+            showError(department, document.getElementById('departmentError'), 'Department is required');
             isValid = false;
+        } else {
+            hideError(department, document.getElementById('departmentError'));
         }
         
         // Validate Year of Study
         if (!yearVal) {
-            yearOfStudy.classList.add('error');
-            const yearError = document.getElementById('yearError');
-            yearError.textContent = 'Please select year of study';
-            yearError.classList.add('show');
+            showError(yearOfStudy, document.getElementById('yearError'), 'Please select year of study');
             isValid = false;
+        } else {
+            hideError(yearOfStudy, document.getElementById('yearError'));
         }
         
         // Validate Faculty
         if (!facultyVal) {
-            faculty.classList.add('error');
-            const facultyError = document.getElementById('facultyError');
-            facultyError.textContent = 'Faculty is required';
-            facultyError.classList.add('show');
+            showError(faculty, document.getElementById('facultyError'), 'Faculty is required');
             isValid = false;
+        } else {
+            hideError(faculty, document.getElementById('facultyError'));
         }
         
         return isValid;
     }
     
-    //CHECK FOR DUPLICATE STUDENT
-    function isDuplicateStudent(email, regNumber) {
-        const students = JSON.parse(localStorage.getItem('students') || '[]');
-        return students.some(student => 
-            student.email === email || student.regNumber === regNumber
-        );
-    }
-    
-    //SAVE STUDENT DATA
-    function saveStudentData(studentData) {
-        let students = JSON.parse(localStorage.getItem('students') || '[]');
-        students.push(studentData);
-        localStorage.setItem('students', JSON.stringify(students));
-    }
-    
-    //SHOW SUCCESS MESSAGE
-    function showSuccessAndRedirect() {
-        const successMessage = document.getElementById('successMessage');
-        if (successMessage) {
-            successMessage.classList.add('show');
-        }
-        
-        // Disable form inputs
-        const inputs = document.querySelectorAll('#regForm input, #regForm select');
-        inputs.forEach(input => {
-            input.disabled = true;
-        });
-        
-        // Redirect to scan page after 2 seconds
-        setTimeout(function() {
-            window.location.href = 'scan.html';
-        }, 2000);
-    }
-    
-    //HANDLE FORM SUBMISSION
+    // ========== HANDLE FORM SUBMISSION ==========
     function handleFormSubmit(event) {
         event.preventDefault();
+        console.log('Form submitted');
         
         // Validate form
-        if (!validateForm()) {
-            return;
+        if (validateForm()) {
+            // Get all values
+            var studentData = {
+                firstName: firstName.value.trim(),
+                lastName: lastName.value.trim(),
+                regNumber: regNumber.value.trim(),
+                email: studentEmail.value.trim(),
+                department: department.value.trim(),
+                yearOfStudy: yearOfStudy.value,
+                faculty: faculty.value.trim(),
+                registrationDate: new Date().toISOString()
+            };
+            
+            // Check for duplicate
+            if (isDuplicateStudent(studentData.email, studentData.regNumber)) {
+                showError(studentEmail, document.getElementById('studentEmailError'), 'Student with this email or registration number already exists');
+                showError(regNumber, document.getElementById('regNumberError'), 'Student with this email or registration number already exists');
+                return;
+            }
+            
+            console.log('Form is valid, saving data...');
+            saveAndRedirect(studentData);
+        } else {
+            console.log('Form validation failed');
         }
-        
-        // Get form values
-        const studentData = {
-            firstName: firstName.value.trim(),
-            lastName: lastName.value.trim(),
-            regNumber: regNumber.value.trim(),
-            email: studentEmail.value.trim(),
-            department: department.value.trim(),
-            yearOfStudy: yearOfStudy.value,
-            faculty: faculty.value.trim(),
-            registrationDate: new Date().toISOString(),
-            status: 'active'
-        };
-        
-        // Check for duplicate
-        if (isDuplicateStudent(studentData.email, studentData.regNumber)) {
-            const emailError = document.getElementById('studentEmailError');
-            emailError.textContent = 'A student with this email or registration number already exists';
-            emailError.classList.add('show');
-            studentEmail.classList.add('error');
-            regNumber.classList.add('error');
-            return;
-        }
-        
-        // Save to localStorage
-        saveStudentData(studentData);
-        
-        // Also store current user for login session
-        const userSession = {
-            email: studentData.email,
-            name: `${studentData.firstName} ${studentData.lastName}`,
-            regNumber: studentData.regNumber,
-            role: 'student',
-            loginTime: new Date().toISOString()
-        };
-        localStorage.setItem('currentUser', JSON.stringify(userSession));
-        localStorage.setItem('isLoggedIn', 'true');
-        
-        // Show success and redirect
-        showSuccessAndRedirect();
     }
     
-    //ADD EVENT LISTENER TO FORM
+    // ========== ADD EVENT LISTENER ==========
     if (regForm) {
         regForm.addEventListener('submit', handleFormSubmit);
     }
     
-    //ADD FOCUS EFFECTS TO INPUTS
-    const allInputs = document.querySelectorAll('.form-group input, .form-group select');
-    allInputs.forEach(input => {
-        input.addEventListener('focus', function() {
-            this.parentElement.classList.add('focused');
-        });
-        
-        input.addEventListener('blur', function() {
-            this.parentElement.classList.remove('focused');
-        });
-    });
-    
-    
-    //PREVENT FORM RESUBMISSION ON PAGE REFRESH
-    if (window.performance && window.performance.navigation.type === 1) {
-        // Page was refreshed, clear any pending data
-        console.log('Page refreshed');
-    }
-    
-    //INPUT CHARACTER COUNTERS
-    function addCharacterCounter(inputId, maxLength) {
-        const input = document.getElementById(inputId);
-        if (input) {
-            input.setAttribute('maxlength', maxLength);
-            const counter = document.createElement('small');
-            counter.style.display = 'block';
-            counter.style.textAlign = 'right';
-            counter.style.fontSize = '11px';
-            counter.style.color = '#999';
-            counter.style.marginTop = '4px';
-            counter.textContent = `0/${maxLength}`;
-            
-            input.parentElement.appendChild(counter);
-            
-            input.addEventListener('input', function() {
-                const length = this.value.length;
-                counter.textContent = `${length}/${maxLength}`;
-                if (length > maxLength * 0.8) {
-                    counter.style.color = '#ed6c02';
-                } else {
-                    counter.style.color = '#999';
-                }
-            });
-        }
-    }
-    
-    
-    addCharacterCounter('firstName', 50);
-    addCharacterCounter('lastName', 50);
-    addCharacterCounter('regNumber', 20);
-    
-    // LOG REGISTRATION ATTEMPT FOR DEBUGGING
+    // ========== LOG FOR DEBUGGING ==========
     console.log('Registration page loaded successfully');
 });
