@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return isValid;
     }
     
-    // ========== HANDLE FORM SUBMISSION ==========
+    //HANDLE FORM SUBMISSION
     function handleFormSubmit(event) {
         event.preventDefault();
         console.log('Form submitted');
@@ -286,11 +286,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // ========== ADD EVENT LISTENER ==========
+    // ADD EVENT LISTENER
     if (regForm) {
         regForm.addEventListener('submit', handleFormSubmit);
     }
     
-    // ========== LOG FOR DEBUGGING ==========
+    //LOG FOR DEBUGGING
     console.log('Registration page loaded successfully');
 });

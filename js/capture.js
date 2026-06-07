@@ -1,70 +1,72 @@
-//FACE CAPTURE PAGE JAVASCRIPT
-// Wait for DOM to be fully loaded
+// ========== CAPTURE PAGE JAVASCRIPT ==========
+
 document.addEventListener('DOMContentLoaded', function() {
     
-    //CLOCK/TIMER FUNCTIONALITY
+    // ========== CLOCK FUNCTIONALITY ==========
     function updateClock() {
-        const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        const timeString = `${hours}:${minutes}:${seconds}`;
-        
-        const navClock = document.getElementById('navClock');
-        if (navClock) {
-            navClock.textContent = timeString;
-        }
+        var now = new Date();
+        var hours = String(now.getHours()).padStart(2, '0');
+        var minutes = String(now.getMinutes()).padStart(2, '0');
+        var seconds = String(now.getSeconds()).padStart(2, '0');
+        var timeString = hours + ':' + minutes + ':' + seconds;
+        var navClock = document.getElementById('navClock');
+        if (navClock) navClock.textContent = timeString;
     }
-    
-    // Update clock every second
     setInterval(updateClock, 1000);
     updateClock();
     
-    //DOM ELEMENTS
-    const video = document.getElementById('videoFeed');
-    const canvas = document.getElementById('photoCanvas');
-    const capturePhotoBtn = document.getElementById('capturePhotoBtn');
-    const retakeBtn = document.getElementById('retakeBtn');
-    const finishBtn = document.getElementById('finishBtn');
-    const previewImage = document.getElementById('previewImage');
-    const capturedPreview = document.getElementById('capturedPreview');
-    const messageBox = document.getElementById('messageBox');
-    const manualCaptureBtn = document.getElementById('captureBtn');
-    
-    let stream = null;
-    let capturedImageData = null;
-    let studentData = null;
-    
-    //MOBILE MENU TOGGLE
+    // ========== MOBILE MENU ==========
     window.toggleMenu = function() {
-        const mobileMenu = document.getElementById('mobileMenu');
-        if (mobileMenu) {
-            mobileMenu.classList.toggle('show');
+        var mobileMenu = document.getElementById('mobileMenu');
+        if (mobileMenu) mobileMenu.classList.toggle('show');
+    }
+    
+    // ========== DOM ELEMENTS ==========
+    var video = document.getElementById('videoFeed');
+    var canvas = document.getElementById('photoCanvas');
+    var capturePhotoBtn = document.getElementById('capturePhotoBtn');
+    var retakeBtn = document.getElementById('retakeBtn');
+    var finishBtn = document.getElementById('finishBtn');
+    var previewImage = document.getElementById('previewImage');
+    var capturedPreview = document.getElementById('capturedPreview');
+    var messageBox = document.getElementById('messageBox');
+    var successOverlay = document.getElementById('successOverlay');
+    var manualCaptureBtn = document.getElementById('captureBtn');
+    
+    var stream = null;
+    var capturedImageData = null;
+    var studentData = null;
+    
+    // ========== API CONFIGURATION ==========
+    var API_BASE_URL = "http://localhost:8072/api/v1";
+    
+    // ========== SHOW MESSAGE ==========
+    function showMessage(message, type) {
+        if (messageBox) {
+            messageBox.textContent = message;
+            messageBox.className = 'message ' + type;
+            messageBox.style.display = 'block';
+            setTimeout(function() {
+                if (messageBox) messageBox.style.display = 'none';
+            }, 3000);
         }
     }
     
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', function(event) {
-        const mobileMenu = document.getElementById('mobileMenu');
-        const hamburger = document.getElementById('hamburger');
-        
-        if (mobileMenu && mobileMenu.classList.contains('show')) {
-            if (hamburger && !hamburger.contains(event.target) && !mobileMenu.contains(event.target)) {
-                mobileMenu.classList.remove('show');
-            }
-        }
-    });
-    
-    //LOAD STUDENT DATA FROM LOCALSTORAGE
+    // ========== LOAD STUDENT DATA ==========
     function loadStudentData() {
         try {
-            const studentData = JSON.parse(localStorage.getItem('studentData'));
+            studentData = JSON.parse(localStorage.getItem('tempStudentData'));
             
-           
+            if (!studentData) {
+                showMessage('No registration data found. Please register first.', 'error');
+                setTimeout(function() {
+                    window.location.href = 'registration.html';
+                }, 2000);
+                return false;
+            }
             
-            // Display student information
-            const displayName = document.getElementById('displayName');
-            const displayRegNumber = document.getElementById('displayRegNumber');
+            var displayName = document.getElementById('displayName');
+            var displayRegNumber = document.getElementById('displayRegNumber');
             
             if (displayName) {
                 displayName.textContent = studentData.firstName + ' ' + studentData.lastName;
@@ -72,82 +74,28 @@ document.addEventListener('DOMContentLoaded', function() {
             if (displayRegNumber) {
                 displayRegNumber.textContent = studentData.regNumber;
             }
-            
             return true;
         } catch (error) {
-            console.error('Error loading student data:', error);
-            showMessage('Error loading student data. Please register again.', 'error');
-            setTimeout(function() {
-                window.location.href = 'registration.html';
-            }, 2000);
+            console.error('Error:', error);
             return false;
         }
     }
     
-    //SHOW MESSAGE FUNCTION
-    function showMessage(message, type) {
-        if (messageBox) {
-            messageBox.textContent = message;
-            messageBox.className = 'message ' + type;
-            messageBox.style.display = 'block';
-            
-            // Auto hide after 3 seconds for info messages
-            if (type === 'info') {
-                setTimeout(function() {
-                    if (messageBox) {
-                        messageBox.style.display = 'none';
-                    }
-                }, 3000);
-            }
-        }
-    }
-    
-    function hideMessage() {
-        if (messageBox) {
-            messageBox.style.display = 'none';
-            messageBox.className = 'message';
-        }
-    }
-    
-    //CAMERA INITIALIZATION
+    // ========== CAMERA INIT ==========
     async function initCamera() {
         try {
-            const streamResult = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 },
-                    facingMode: "user"
-                }
+            var streamResult = await navigator.mediaDevices.getUserMedia({
+                video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" }
             });
             stream = streamResult;
-            if (video) {
-                video.srcObject = stream;
-            }
+            if (video) video.srcObject = stream;
             showMessage('Camera ready. Center your face in the circle.', 'info');
         } catch (err) {
-            console.error("Camera error:", err);
-            
-            if (err.name === 'NotAllowedError') {
-                showMessage('Camera access denied. Please allow camera access and refresh the page.', 'error');
-            } else if (err.name === 'NotFoundError') {
-                showMessage('No camera found. Please connect a camera and refresh the page.', 'error');
-            } else {
-                showMessage('Unable to access camera. Please check your camera settings.', 'error');
-            }
+            showMessage('Camera access denied. Please allow camera access.', 'error');
         }
     }
     
-    //STOP CAMERA STREAM
-    function stopCamera() {
-        if (stream) {
-            stream.getTracks().forEach(function(track) {
-                track.stop();
-            });
-            stream = null;
-        }
-    }
-    
-    //CAPTURE PHOTO (Only face area from circle)
+    // ========== CAPTURE PHOTO ==========
     function capturePhoto() {
         if (!video || !video.srcObject || !stream) {
             showMessage('Camera not ready. Please wait...', 'error');
@@ -155,297 +103,236 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         try {
-            const ctx = canvas.getContext('2d');
+            var ctx = canvas.getContext('2d');
+            var videoRect = video.getBoundingClientRect();
+            var scanFrame = document.querySelector('.scan-frame');
+            if (!scanFrame) { showMessage('Scanner frame not found.', 'error'); return; }
             
-            // Get video and overlay dimensions
-            const videoRect = video.getBoundingClientRect();
-            const scanFrame = document.querySelector('.scan-frame');
+            var overlayRect = scanFrame.getBoundingClientRect();
+            var scaleX = video.videoWidth / videoRect.width;
+            var scaleY = video.videoHeight / videoRect.height;
+            var circleX = (overlayRect.left - videoRect.left) * scaleX;
+            var circleY = (overlayRect.top - videoRect.top) * scaleY;
+            var circleSize = overlayRect.width * scaleX;
             
-            if (!scanFrame) {
-                showMessage('Scanner frame not found. Please refresh the page.', 'error');
-                return;
-            }
-            
-            const overlayRect = scanFrame.getBoundingClientRect();
-            
-            // Calculate scale factors
-            const scaleX = video.videoWidth / videoRect.width;
-            const scaleY = video.videoHeight / videoRect.height;
-            
-            // Calculate circle position and size
-            const circleX = (overlayRect.left - videoRect.left) * scaleX;
-            const circleY = (overlayRect.top - videoRect.top) * scaleY;
-            const circleSize = overlayRect.width * scaleX;
-            
-            // Set canvas dimensions
             canvas.width = circleSize;
             canvas.height = circleSize;
             
-            // Draw only the circular area
             ctx.save();
             ctx.beginPath();
             ctx.arc(circleSize / 2, circleSize / 2, circleSize / 2, 0, Math.PI * 2);
             ctx.clip();
-            
-            // Mirror the image
             ctx.translate(canvas.width, 0);
             ctx.scale(-1, 1);
             ctx.drawImage(video, circleX, circleY, circleSize, circleSize, 0, 0, canvas.width, canvas.height);
-            
             ctx.restore();
             
-            // Add border to captured image
-            ctx.beginPath();
-            ctx.arc(circleSize / 2, circleSize / 2, circleSize / 2 - 2, 0, Math.PI * 2);
-            ctx.strokeStyle = '#667eea';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-            
-            // Save captured image data
             capturedImageData = canvas.toDataURL('image/jpeg', 0.9);
             
-            const payload = {
+            if (previewImage) previewImage.src = capturedImageData;
+            if (capturedPreview) capturedPreview.style.display = 'block';
+            if (capturePhotoBtn) capturePhotoBtn.style.display = 'none';
+            if (retakeBtn) retakeBtn.style.display = 'block';
+            if (finishBtn) finishBtn.style.display = 'block';
+            
+            showMessage('Face captured! Click "Finish Registration" to complete.', 'success');
+        } catch (error) {
+            showMessage('Error capturing face. Please try again.', 'error');
+        }
+    }
+    
+    // ========== RETAKE PHOTO ==========
+    function retakePhoto() {
+        capturedImageData = null;
+        if (capturedPreview) capturedPreview.style.display = 'none';
+        if (previewImage) previewImage.src = '';
+        if (capturePhotoBtn) capturePhotoBtn.style.display = 'block';
+        if (retakeBtn) retakeBtn.style.display = 'none';
+        if (finishBtn) finishBtn.style.display = 'none';
+        showMessage('Position your face in the circle and capture again.', 'info');
+    }
+    
+    // ========== SEND DATA TO BACKEND DATABASE ==========
+    async function sendToDatabase(studentData, capturedImageData) {
+        try {
+            // Prepare the payload for the API
+            var payload = {
                 firstName: studentData.firstName,
                 lastName: studentData.lastName,
                 regNumber: studentData.regNumber,
-                studentEmail: studentData.studentEmail,
+                studentEmail: studentData.email,
                 department: studentData.department,
                 faculty: studentData.faculty,
                 yearOfStudy: studentData.yearOfStudy,
                 image: capturedImageData
             };
-
-
-             fetch("http://localhost:8072/api/v1/admin/create/student",{
+            
+            console.log("Sending data to database:", payload);
+            
+            // Make API call to backend
+            var response = await fetch("http://localhost:8072/api/v1/admin/create/student", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
-
                 },
                 body: JSON.stringify(payload)
-
-             })
-
-
-
-
-
-
-
-
+            });
             
-            // Show preview
-            if (previewImage) {
-                previewImage.src = capturedImageData;
+            // Parse the response
+            var result = await response.json();
+            console.log("Database response:", result);
+            
+            if (response.ok && result.success) {
+                return { success: true, data: result, message: "Student saved to database successfully!" };
+            } else {
+                return { success: false, message: result.message || "Failed to save to database" };
             }
-            if (capturedPreview) {
-                capturedPreview.style.display = 'block';
-            }
-            
-            // Update button visibility
-            if (capturePhotoBtn) capturePhotoBtn.style.display = 'none';
-            if (retakeBtn) retakeBtn.style.display = 'block';
-            if (finishBtn) finishBtn.style.display = 'block';
-            
-            showMessage('Face captured successfully! Click "Complete Registration" to finish.', 'success');
             
         } catch (error) {
-            console.error('Capture error:', error);
-            showMessage('Error capturing face. Please try again.', 'error');
+            console.error("Database error:", error);
+            return { success: false, message: "Network error: Unable to connect to server" };
         }
     }
     
-    //RETAKE PHOTO
-    function retakePhoto() {
-        // Reset captured data
-        capturedImageData = null;
-        
-        // Hide preview
-        if (capturedPreview) {
-            capturedPreview.style.display = 'none';
-        }
-        if (previewImage) {
-            previewImage.src = '';
-        }
-        
-        // Reset button visibility
-        if (capturePhotoBtn) capturePhotoBtn.style.display = 'block';
-        if (retakeBtn) retakeBtn.style.display = 'none';
-        if (finishBtn) finishBtn.style.display = 'none';
-        
-        // Hide message
-        hideMessage();
-        
-        showMessage('Position your face in the circle and capture again.', 'info');
-    }
-    
-    //VALIDATE FACE IMAGE
-    function validateFaceImage(imageData) {
-        return new Promise(function(resolve) {
-            var img = new Image();
-            img.onload = function() {
-                // Check if image has content (not empty/black)
-                var tempCanvas = document.createElement('canvas');
-                var tempCtx = tempCanvas.getContext('2d');
-                tempCanvas.width = img.width;
-                tempCanvas.height = img.height;
-                tempCtx.drawImage(img, 0, 0);
-                
-                var imageDataObj = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-                var data = imageDataObj.data;
-                
-                // Check if image has any non-black pixels
-                var hasContent = false;
-                for (var i = 0; i < data.length; i += 4) {
-                    if (data[i] > 10 || data[i+1] > 10 || data[i+2] > 10) {
-                        hasContent = true;
-                        break;
-                    }
-                }
-                
-                resolve(hasContent);
-            };
-            img.onerror = function() {
-                resolve(false);
-            };
-            img.src = imageData;
-        });
-    }
-    
-    //SAVE STUDENT WITH FACE IMAGE
-    async function completeRegistration() {
-        if (!capturedImageData) {
-            showMessage('Please capture your face first!', 'error');
-            return;
-        }
-        
-        // Validate face image
-        var isValidImage = await validateFaceImage(capturedImageData);
-        if (!isValidImage) {
-            showMessage('Invalid face image. Please retake your photo.', 'error');
-            retakePhoto();
-            return;
-        }
-        
-        if (finishBtn) {
-            finishBtn.disabled = true;
-            finishBtn.textContent = 'Saving...';
-        }
-        
+    // ========== SAVE TO LOCAL STORAGE (Backup) ==========
+    function saveToLocalStorage(fullStudentData) {
         try {
-            // Get existing students or create new array
             var students = JSON.parse(localStorage.getItem('students') || '[]');
             
             // Check if student already exists
             var existingIndex = -1;
             for (var i = 0; i < students.length; i++) {
-                if (students[i].email === studentData.email) {
+                if (students[i].email === fullStudentData.email) {
                     existingIndex = i;
                     break;
                 }
             }
             
-            // Create full student data object
-            var fullStudentData = {
-                firstName: studentData.firstName,
-                lastName: studentData.lastName,
-                regNumber: studentData.regNumber,
-                email: studentData.email,
-                password: studentData.password,
-                department: studentData.department,
-                yearOfStudy: studentData.yearOfStudy,
-                faculty: studentData.faculty,
-                faceImage: capturedImageData,
-                faceEncoding: null,
-                registrationDate: new Date().toISOString(),
-                status: 'active',
-                lastLogin: null
-            };
-            
             if (existingIndex >= 0) {
-                // Update existing student with face image
                 students[existingIndex] = fullStudentData;
-                showMessage('Student data updated successfully!', 'success');
             } else {
                 students.push(fullStudentData);
-                showMessage('Registration completed successfully!', 'success');
             }
             
-            // Save to localStorage
             localStorage.setItem('students', JSON.stringify(students));
             
-            // Also store current user session
+            // Create user session
             var userSession = {
-                email: studentData.email,
-                name: studentData.firstName + ' ' + studentData.lastName,
-                regNumber: studentData.regNumber,
+                email: fullStudentData.email,
+                name: fullStudentData.firstName + ' ' + fullStudentData.lastName,
+                regNumber: fullStudentData.regNumber,
                 role: 'student',
                 loginTime: new Date().toISOString(),
                 hasFaceImage: true
             };
             localStorage.setItem('currentUser', JSON.stringify(userSession));
             localStorage.setItem('isLoggedIn', 'true');
-            
-            // Clear temporary data
             localStorage.removeItem('tempStudentData');
             
-            // Stop camera
-            stopCamera();
+            return true;
+        } catch (error) {
+            console.error("LocalStorage error:", error);
+            return false;
+        }
+    }
+    
+    // ========== SHOW SUCCESS POPUP THEN REDIRECT TO HOME ==========
+    function showSuccessPopupAndRedirect() {
+        // Show the success overlay popup
+        if (successOverlay) {
+            successOverlay.classList.add('show');
+        }
+        
+        // Wait 3 seconds for user to see the success message
+        setTimeout(function() {
+            // Redirect to home page (index.html)
+            window.location.href = 'index.html';
+        }, 3000);
+    }
+    
+    // ========== COMPLETE REGISTRATION (WITH DATABASE SAVE) ==========
+    async function completeRegistration() {
+        if (!capturedImageData) {
+            showMessage('Please capture your face first!', 'error');
+            return;
+        }
+        
+        if (finishBtn) {
+            finishBtn.disabled = true;
+            finishBtn.textContent = 'Processing...';
+        }
+        
+        showMessage('Saving registration to database...', 'info');
+        
+        try {
+            // ==== STEP 1: Send data to Backend Database ====
+            var dbResult = await sendToDatabase(studentData, capturedImageData);
             
-            // Redirect to dashboard after 2 seconds
-            setTimeout(function() {
-                window.location.href = 'dashboard.html';
-            }, 2000);
+            if (dbResult.success) {
+                console.log("Database save successful:", dbResult);
+                
+                // ==== STEP 2: Save to Local Storage as backup ====
+                var fullStudentData = {
+                    firstName: studentData.firstName,
+                    lastName: studentData.lastName,
+                    regNumber: studentData.regNumber,
+                    email: studentData.email,
+                    department: studentData.department,
+                    yearOfStudy: studentData.yearOfStudy,
+                    faculty: studentData.faculty,
+                    faceImage: capturedImageData,
+                    registrationDate: new Date().toISOString(),
+                    status: 'active',
+                    syncedToDatabase: true,
+                    databaseId: dbResult.data?.id || null
+                };
+                
+                saveToLocalStorage(fullStudentData);
+                
+                // Stop camera
+                if (stream) {
+                    stream.getTracks().forEach(function(track) { track.stop(); });
+                }
+                
+                // Show success popup and redirect to home
+                showSuccessPopupAndRedirect();
+                
+            } else {
+                // Database save failed
+                console.error("Database save failed:", dbResult.message);
+                showMessage(dbResult.message + " - Please check your connection.", 'error');
+                
+                if (finishBtn) {
+                    finishBtn.disabled = false;
+                    finishBtn.textContent = 'Finish Registration';
+                }
+            }
             
         } catch (error) {
             console.error('Registration error:', error);
-            showMessage('Error saving registration. Please try again.', 'error');
+            showMessage('Error saving registration. Please check your internet connection.', 'error');
             if (finishBtn) {
                 finishBtn.disabled = false;
-                finishBtn.textContent = '✓ Complete Registration & Continue';
+                finishBtn.textContent = 'Finish Registration';
             }
         }
     }
     
-    //EVENT LISTENERS
-    if (capturePhotoBtn) {
-        capturePhotoBtn.addEventListener('click', capturePhoto);
-    }
+    // ========== EVENT LISTENERS ==========
+    if (capturePhotoBtn) capturePhotoBtn.addEventListener('click', capturePhoto);
+    if (retakeBtn) retakeBtn.addEventListener('click', retakePhoto);
+    if (finishBtn) finishBtn.addEventListener('click', completeRegistration);
+    if (manualCaptureBtn) manualCaptureBtn.addEventListener('click', capturePhoto);
     
-    if (retakeBtn) {
-        retakeBtn.addEventListener('click', retakePhoto);
-    }
-    
-    if (finishBtn) {
-        finishBtn.addEventListener('click', completeRegistration);
-    }
-    
-    // Manual capture button in video wrapper
-    if (manualCaptureBtn) {
-        manualCaptureBtn.addEventListener('click', capturePhoto);
-    }
-    
-    //PREVENT ACCIDENTAL PAGE REFRESH
-    window.addEventListener('beforeunload', function(e) {
-        if (capturedImageData && finishBtn && finishBtn.style.display !== 'none') {
-            // Registration in progress, show warning
-            e.preventDefault();
-            e.returnValue = 'Registration in progress. Are you sure you want to leave?';
-            return e.returnValue;
-        }
-    });
-    
-    //INITIALIZE PAGE
-    var dataLoaded = loadStudentData();
-    if (dataLoaded !== false) {
+    // ========== INITIALIZE ==========
+    if (loadStudentData()) {
         initCamera();
     }
     
-    // CLEAN UP ON PAGE UNLOAD
+    // Clean up
     window.addEventListener('beforeunload', function() {
-        stopCamera();
+        if (stream) {
+            stream.getTracks().forEach(function(track) { track.stop(); });
+        }
     });
-    
-    //LOG FOR DEBUGGING
-    console.log('Face capture page loaded successfully');
 });
