@@ -60,13 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const studentData = JSON.parse(localStorage.getItem('studentData'));
             
-            if (!studentData) {
-                showMessage('No registration data found. Please register first.', 'error');
-                setTimeout(function() {
-                    window.location.href = 'registration.html';
-                }, 2000);
-                return false;
-            }
+           
             
             // Display student information
             const displayName = document.getElementById('displayName');
