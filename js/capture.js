@@ -153,46 +153,81 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // ========== SEND DATA TO BACKEND DATABASE ==========
-    async function sendToDatabase(studentData, capturedImageData) {
-        try {
-            // Prepare the payload for the API
-            var payload = {
-                firstName: studentData.firstName,
-                lastName: studentData.lastName,
-                regNumber: studentData.regNumber,
-                studentEmail: studentData.email,
-                department: studentData.department,
-                faculty: studentData.faculty,
-                yearOfStudy: studentData.yearOfStudy,
-                image: capturedImageData
+
+ async function sendToDatabase(studentData, capturedImageData) {
+    try {
+
+        const token = localStorage.getItem("jwtToken");
+
+        console.log("JWT Token:", token);
+
+        if (!token) {
+            return {
+                success: false,
+                message: "JWT token not found. Please login again."
             };
-            
-            console.log("Sending data to database:", payload);
-            
-            // Make API call to backend
-            var response = await fetch("http://localhost:8072/api/v1/admin/create/student", {
+        }
+
+        const payload = {
+            firstName: studentData.firstName,
+            lastName: studentData.lastName,
+            regNumber: studentData.regNumber,
+            studentEmail: studentData.email,
+            department: studentData.department,
+            faculty: studentData.faculty,
+            yearOfStudy: studentData.yearOfStudy,
+            image: capturedImageData
+        };
+
+        console.log("Sending data to database...");
+        console.log(payload);
+
+        
+    console.log("Token =", token);
+    console.log("URL =", "http://localhost:8072/api/v1/admin/create/student");
+    console.log("Payload =", payload);
+
+        const response = await fetch(
+            "http://localhost:8072/api/v1/admin/create/student",
+            {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify(payload)
-            });
-            
-            // Parse the response
-            var result = await response.json();
-            console.log("Database response:", result);
-            
-            if (response.ok && result.success) {
-                return { success: true, data: result, message: "Student saved to database successfully!" };
-            } else {
-                return { success: false, message: result.message || "Failed to save to database" };
             }
-            
-        } catch (error) {
-            console.error("Database error:", error);
-            return { success: false, message: "Network error: Unable to connect to server" };
+        );
+
+        console.log("Response Status:", response.status);
+        console.log("Response OK:", response.ok);
+
+        const text = await response.text();
+
+        console.log("Backend Response:", text);
+
+        if (response.ok) {
+            return {
+                success: true,
+                data: text
+            };
         }
+
+        return {
+            success: false,
+            message: text || "Failed to save student"
+        };
+
+    } catch (error) {
+
+        console.error("FETCH ERROR:", error);
+
+        return {
+            success: false,
+            message: error.message
+        };
     }
+}
     
     // ========== SAVE TO LOCAL STORAGE (Backup) ==========
     function saveToLocalStorage(fullStudentData) {

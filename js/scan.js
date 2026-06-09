@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var capturedImageData = null;
     
     //API CONFIGURATION
-    var API_BASE_URL = "http://localhost:8072/api/v1";
+    var API_BASE_URL = "http://localhost:8072/api/v1/admin/verify/student";
     
     //DATABASE VERIFICATION FUNCTION
     
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             console.log("Verifying face with database...");
             
-            var response = await fetch(API_BASE_URL + "/admin/verify/face", {
+            var response = await fetch(API_BASE_URL, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
