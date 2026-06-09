@@ -1,8 +1,8 @@
-// ========== CAPTURE PAGE JAVASCRIPT ==========
+//CAPTURE PAGE JAVASCRIPT
 
 document.addEventListener('DOMContentLoaded', function() {
     
-    // ========== CLOCK FUNCTIONALITY ==========
+    //CLOCK FUNCTIONALITY
     function updateClock() {
         var now = new Date();
         var hours = String(now.getHours()).padStart(2, '0');
@@ -15,13 +15,13 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(updateClock, 1000);
     updateClock();
     
-    // ========== MOBILE MENU ==========
+    //MOBILE MENU
     window.toggleMenu = function() {
         var mobileMenu = document.getElementById('mobileMenu');
         if (mobileMenu) mobileMenu.classList.toggle('show');
     }
     
-    // ========== DOM ELEMENTS ==========
+    //DOM ELEMENTS
     var video = document.getElementById('videoFeed');
     var canvas = document.getElementById('photoCanvas');
     var capturePhotoBtn = document.getElementById('capturePhotoBtn');
@@ -37,10 +37,10 @@ document.addEventListener('DOMContentLoaded', function() {
     var capturedImageData = null;
     var studentData = null;
     
-    // ========== API CONFIGURATION ==========
+    // API CONFIGURATION
     var API_BASE_URL = "http://localhost:8072/api/v1";
     
-    // ========== SHOW MESSAGE ==========
+    //SHOW MESSAGE
     function showMessage(message, type) {
         if (messageBox) {
             messageBox.textContent = message;
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // ========== LOAD STUDENT DATA ==========
+    //LOAD STUDENT DATA
     function loadStudentData() {
         try {
             studentData = JSON.parse(localStorage.getItem('tempStudentData'));
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // ========== CAMERA INIT ==========
+    //CAMERA INIT
     async function initCamera() {
         try {
             var streamResult = await navigator.mediaDevices.getUserMedia({
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // ========== CAPTURE PHOTO ==========
+    //CAPTURE PHOTO
     function capturePhoto() {
         if (!video || !video.srcObject || !stream) {
             showMessage('Camera not ready. Please wait...', 'error');
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // ========== RETAKE PHOTO ==========
+    //RETAKE PHOTO
     function retakePhoto() {
         capturedImageData = null;
         if (capturedPreview) capturedPreview.style.display = 'none';
@@ -190,6 +190,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const response = await fetch(
             "http://localhost:8072/api/v1/admin/create/student",
             {
+    //SEND DATA TO BACKEND DATABASE
+    async function sendToDatabase(studentData, capturedImageData) {
+        try {
+            // Prepare the payload for the API
+            var payload = {
+                firstName: studentData.firstName,
+                lastName: studentData.lastName,
+                regNumber: studentData.regNumber,
+                studentEmail: studentData.email,
+                department: studentData.department,
+                faculty: studentData.faculty,
+                yearOfStudy: studentData.yearOfStudy,
+                image: capturedImageData
+            };
+            
+            console.log("Sending data to database:", payload);
+            
+            // Make API call to backend
+            var response = await fetch("http://localhost:8072/api/v1/admin/create/student", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -229,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 }
     
-    // ========== SAVE TO LOCAL STORAGE (Backup) ==========
+    //SAVE TO LOCAL STORAGE (Backup)
     function saveToLocalStorage(fullStudentData) {
         try {
             var students = JSON.parse(localStorage.getItem('students') || '[]');
@@ -271,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // ========== SHOW SUCCESS POPUP THEN REDIRECT TO HOME ==========
+    //SHOW SUCCESS POPUP THEN REDIRECT TO HOME
     function showSuccessPopupAndRedirect() {
         // Show the success overlay popup
         if (successOverlay) {
@@ -285,7 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
     
-    // ========== COMPLETE REGISTRATION (WITH DATABASE SAVE) ==========
+    //COMPLETE REGISTRATION
     async function completeRegistration() {
         if (!capturedImageData) {
             showMessage('Please capture your face first!', 'error');
@@ -300,13 +319,13 @@ document.addEventListener('DOMContentLoaded', function() {
         showMessage('Saving registration to database...', 'info');
         
         try {
-            // ==== STEP 1: Send data to Backend Database ====
+            // Send data to Backend Database ====
             var dbResult = await sendToDatabase(studentData, capturedImageData);
             
             if (dbResult.success) {
                 console.log("Database save successful:", dbResult);
                 
-                // ==== STEP 2: Save to Local Storage as backup ====
+                //Save to Local Storage as backup
                 var fullStudentData = {
                     firstName: studentData.firstName,
                     lastName: studentData.lastName,
@@ -353,13 +372,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // ========== EVENT LISTENERS ==========
+    //EVENT LISTENERS
     if (capturePhotoBtn) capturePhotoBtn.addEventListener('click', capturePhoto);
     if (retakeBtn) retakeBtn.addEventListener('click', retakePhoto);
     if (finishBtn) finishBtn.addEventListener('click', completeRegistration);
     if (manualCaptureBtn) manualCaptureBtn.addEventListener('click', capturePhoto);
     
-    // ========== INITIALIZE ==========
+    //INITIALIZE
     if (loadStudentData()) {
         initCamera();
     }
