@@ -15,14 +15,7 @@ const refreshBtn = document.getElementById('refreshBtn');
 // Scan history data
 let scanHistory = [];
 
-// Student data
-let currentStudent = {
-    name: "GEORGE OTIENO",
-    id: "BIT/0074/23",
-    course: "Information Technology",
-    eligible: true,
-    email: "george.otieno@university.ac.ke"
-};
+
 
 //  LIVE CLOCK FUNCTION 
 function updateClock() {

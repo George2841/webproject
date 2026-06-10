@@ -1,8 +1,11 @@
-//CAPTURE PAGE JAVASCRIPT
+//FACE CAPTURE PAGE JAVASCRIPT 
+// This file handles camera access, face capture, and sending data to the backend
 
 document.addEventListener('DOMContentLoaded', function() {
     
-    //CLOCK FUNCTIONALITY
+    
+    // CLOCK FUNCTION - Shows live time in navigation bar
+    
     function updateClock() {
         var now = new Date();
         var hours = String(now.getHours()).padStart(2, '0');
@@ -12,47 +15,60 @@ document.addEventListener('DOMContentLoaded', function() {
         var navClock = document.getElementById('navClock');
         if (navClock) navClock.textContent = timeString;
     }
+    // Update the clock every second
     setInterval(updateClock, 1000);
     updateClock();
     
-    //MOBILE MENU
+    
+    // MOBILE MENU - Handles hamburger menu toggle
+    
     window.toggleMenu = function() {
         var mobileMenu = document.getElementById('mobileMenu');
         if (mobileMenu) mobileMenu.classList.toggle('show');
     }
     
-    //DOM ELEMENTS
-    var video = document.getElementById('videoFeed');
-    var canvas = document.getElementById('photoCanvas');
-    var capturePhotoBtn = document.getElementById('capturePhotoBtn');
-    var retakeBtn = document.getElementById('retakeBtn');
-    var finishBtn = document.getElementById('finishBtn');
-    var previewImage = document.getElementById('previewImage');
-    var capturedPreview = document.getElementById('capturedPreview');
-    var messageBox = document.getElementById('messageBox');
-    var successOverlay = document.getElementById('successOverlay');
-    var manualCaptureBtn = document.getElementById('captureBtn');
+   
+    //  DOM ELEMENTS - Get all HTML elements we need
     
-    var stream = null;
-    var capturedImageData = null;
-    var studentData = null;
+    var video = document.getElementById('videoFeed');           // Camera video feed
+    var canvas = document.getElementById('photoCanvas');       // Hidden canvas for image processing
+    var capturePhotoBtn = document.getElementById('capturePhotoBtn');  // Capture button
+    var retakeBtn = document.getElementById('retakeBtn');              // Retake button
+    var finishBtn = document.getElementById('finishBtn');              // Finish registration button
+    var previewImage = document.getElementById('previewImage');       // Where captured image preview shows
+    var capturedPreview = document.getElementById('capturedPreview'); // Preview container
+    var messageBox = document.getElementById('messageBox');           // For showing messages to user
+    var successOverlay = document.getElementById('successOverlay');   // Success popup overlay
+    var manualCaptureBtn = document.getElementById('captureBtn');     // Alternative capture button
     
-    // API CONFIGURATION
+    // Variables to store data
+    var stream = null;              // Camera stream
+    var capturedImageData = null;   //image data after capture
+    var studentData = null;         // Student information from registration
+    
+    
+    // 4. API CONFIGURATION - Backend connection settings
+    
     var API_BASE_URL = "http://localhost:8072/api/v1";
     
-    //SHOW MESSAGE
+    
+    // 5. HELPER FUNCTIONS
+    
+    
+    // Show a temporary message to the user
     function showMessage(message, type) {
         if (messageBox) {
             messageBox.textContent = message;
             messageBox.className = 'message ' + type;
             messageBox.style.display = 'block';
+            // Hide message after 3 seconds
             setTimeout(function() {
                 if (messageBox) messageBox.style.display = 'none';
             }, 3000);
         }
     }
     
-    //LOAD STUDENT DATA
+    // Load student data that was saved during registration
     function loadStudentData() {
         try {
             studentData = JSON.parse(localStorage.getItem('tempStudentData'));
@@ -65,6 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
             
+            // Display student name and registration number on the page
             var displayName = document.getElementById('displayName');
             var displayRegNumber = document.getElementById('displayRegNumber');
             
@@ -76,16 +93,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             return true;
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error loading student data:', error);
             return false;
         }
     }
     
-    //CAMERA INIT
+    
+    // 6. CAMERA FUNCTIONS
+    
+    
+    // Start the user's camera
     async function initCamera() {
         try {
             var streamResult = await navigator.mediaDevices.getUserMedia({
-                video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" }
+                video: { 
+                    width: { ideal: 1280 }, 
+                    height: { ideal: 720 }, 
+                    facingMode: "user" 
+                }
             });
             stream = streamResult;
             if (video) video.srcObject = stream;
@@ -95,8 +120,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    //CAPTURE PHOTO
+    // Capture photo from the video feed (only the circular area)
     function capturePhoto() {
+        // Make sure camera is ready
         if (!video || !video.srcObject || !stream) {
             showMessage('Camera not ready. Please wait...', 'error');
             return;
@@ -106,8 +132,12 @@ document.addEventListener('DOMContentLoaded', function() {
             var ctx = canvas.getContext('2d');
             var videoRect = video.getBoundingClientRect();
             var scanFrame = document.querySelector('.scan-frame');
-            if (!scanFrame) { showMessage('Scanner frame not found.', 'error'); return; }
+            if (!scanFrame) { 
+                showMessage('Scanner frame not found.', 'error'); 
+                return; 
+            }
             
+            // Calculate the circular area position
             var overlayRect = scanFrame.getBoundingClientRect();
             var scaleX = video.videoWidth / videoRect.width;
             var scaleY = video.videoHeight / videoRect.height;
@@ -115,20 +145,24 @@ document.addEventListener('DOMContentLoaded', function() {
             var circleY = (overlayRect.top - videoRect.top) * scaleY;
             var circleSize = overlayRect.width * scaleX;
             
+            // Set canvas size to match the circle
             canvas.width = circleSize;
             canvas.height = circleSize;
             
+            // Draw only the circular area from the video
             ctx.save();
             ctx.beginPath();
             ctx.arc(circleSize / 2, circleSize / 2, circleSize / 2, 0, Math.PI * 2);
             ctx.clip();
             ctx.translate(canvas.width, 0);
-            ctx.scale(-1, 1);
+            ctx.scale(-1, 1);  // Mirror the image
             ctx.drawImage(video, circleX, circleY, circleSize, circleSize, 0, 0, canvas.width, canvas.height);
             ctx.restore();
             
+            // Save the captured image as base64
             capturedImageData = canvas.toDataURL('image/jpeg', 0.9);
             
+            // Show preview and update buttons
             if (previewImage) previewImage.src = capturedImageData;
             if (capturedPreview) capturedPreview.style.display = 'block';
             if (capturePhotoBtn) capturePhotoBtn.style.display = 'none';
@@ -141,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    //RETAKE PHOTO
+    // Allow user to retake the photo
     function retakePhoto() {
         capturedImageData = null;
         if (capturedPreview) capturedPreview.style.display = 'none';
@@ -152,48 +186,27 @@ document.addEventListener('DOMContentLoaded', function() {
         showMessage('Position your face in the circle and capture again.', 'info');
     }
     
-    // ========== SEND DATA TO BACKEND DATABASE ==========
-
- async function sendToDatabase(studentData, capturedImageData) {
-    try {
-
-        const token = localStorage.getItem("jwtToken");
-
-        console.log("JWT Token:", token);
-
-        if (!token) {
-            return {
-                success: false,
-                message: "JWT token not found. Please login again."
-            };
-        }
-
-        const payload = {
-            firstName: studentData.firstName,
-            lastName: studentData.lastName,
-            regNumber: studentData.regNumber,
-            studentEmail: studentData.email,
-            department: studentData.department,
-            faculty: studentData.faculty,
-            yearOfStudy: studentData.yearOfStudy,
-            image: capturedImageData
-        };
-
-        console.log("Sending data to database...");
-        console.log(payload);
-
-        
-    console.log("Token =", token);
-    console.log("URL =", "http://localhost:8072/api/v1/admin/create/student");
-    console.log("Payload =", payload);
-
-        const response = await fetch(
-            "http://localhost:8072/api/v1/admin/create/student",
-            {
-    //SEND DATA TO BACKEND DATABASE
+    
+    // 7. BACKEND DATABASE FUNCTIONS
+    
+    
+    // Send student data and face image to the backend API
     async function sendToDatabase(studentData, capturedImageData) {
         try {
-            // Prepare the payload for the API
+            // Get the authentication token from storage
+            var token = localStorage.getItem("jwtToken");
+            
+            console.log("JWT Token:", token);
+            
+            // Check if user is logged in
+            if (!token) {
+                return {
+                    success: false,
+                    message: "JWT token not found. Please login again."
+                };
+            }
+            
+            // Prepare the data to send to the server
             var payload = {
                 firstName: studentData.firstName,
                 lastName: studentData.lastName,
@@ -205,50 +218,55 @@ document.addEventListener('DOMContentLoaded', function() {
                 image: capturedImageData
             };
             
-            console.log("Sending data to database:", payload);
+            console.log("Sending data to database...");
+            console.log("Payload:", payload);
+            console.log("API URL:", "http://localhost:8072/api/v1/admin/create/student");
             
-            // Make API call to backend
+            // Make the API call
             var response = await fetch("http://localhost:8072/api/v1/admin/create/student", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    "Authorization": "Bearer " + token
                 },
                 body: JSON.stringify(payload)
+            });
+            
+            console.log("Response Status:", response.status);
+            console.log("Response OK:", response.ok);
+            
+            // Get the response text
+            var responseText = await response.text();
+            console.log("Backend Response:", responseText);
+            
+            // Check if request was successful
+            if (response.ok) {
+                return {
+                    success: true,
+                    data: responseText,
+                    message: "Student registered successfully!"
+                };
+            } else {
+                return {
+                    success: false,
+                    message: responseText || "Failed to save student to database"
+                };
             }
-        );
-
-        console.log("Response Status:", response.status);
-        console.log("Response OK:", response.ok);
-
-        const text = await response.text();
-
-        console.log("Backend Response:", text);
-
-        if (response.ok) {
+            
+        } catch (error) {
+            console.error("Network Error:", error);
             return {
-                success: true,
-                data: text
+                success: false,
+                message: error.message || "Network error. Please check your connection."
             };
         }
-
-        return {
-            success: false,
-            message: text || "Failed to save student"
-        };
-
-    } catch (error) {
-
-        console.error("FETCH ERROR:", error);
-
-        return {
-            success: false,
-            message: error.message
-        };
     }
-}
     
-    //SAVE TO LOCAL STORAGE (Backup)
+    
+    // 8. LOCAL STORAGE FUNCTIONS (Backup)
+    
+    
+    // Save student data to localStorage as a backup
     function saveToLocalStorage(fullStudentData) {
         try {
             var students = JSON.parse(localStorage.getItem('students') || '[]');
@@ -262,6 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
+            // Add or update student record
             if (existingIndex >= 0) {
                 students[existingIndex] = fullStudentData;
             } else {
@@ -270,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             localStorage.setItem('students', JSON.stringify(students));
             
-            // Create user session
+            // Create a user session
             var userSession = {
                 email: fullStudentData.email,
                 name: fullStudentData.firstName + ' ' + fullStudentData.lastName,
@@ -281,6 +300,8 @@ document.addEventListener('DOMContentLoaded', function() {
             };
             localStorage.setItem('currentUser', JSON.stringify(userSession));
             localStorage.setItem('isLoggedIn', 'true');
+            
+            // Clean up temporary data
             localStorage.removeItem('tempStudentData');
             
             return true;
@@ -290,27 +311,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    //SHOW SUCCESS POPUP THEN REDIRECT TO HOME
+    
+    // 9. REGISTRATION COMPLETION
+    
+    
+    // Show success popup and redirect to home page
     function showSuccessPopupAndRedirect() {
         // Show the success overlay popup
         if (successOverlay) {
             successOverlay.classList.add('show');
         }
         
-        // Wait 3 seconds for user to see the success message
+        // Wait 3 seconds for user to see the success message, then redirect to home
         setTimeout(function() {
-            // Redirect to home page (index.html)
             window.location.href = 'index.html';
         }, 3000);
     }
     
-    //COMPLETE REGISTRATION
+    // Complete the registration process
     async function completeRegistration() {
+        // Make sure a face has been captured
         if (!capturedImageData) {
             showMessage('Please capture your face first!', 'error');
             return;
         }
         
+        // Disable the finish button to prevent double submission
         if (finishBtn) {
             finishBtn.disabled = true;
             finishBtn.textContent = 'Processing...';
@@ -319,13 +345,13 @@ document.addEventListener('DOMContentLoaded', function() {
         showMessage('Saving registration to database...', 'info');
         
         try {
-            // Send data to Backend Database ====
+            // Send data to backend database
             var dbResult = await sendToDatabase(studentData, capturedImageData);
             
             if (dbResult.success) {
                 console.log("Database save successful:", dbResult);
                 
-                //Save to Local Storage as backup
+                // Prepare complete student data
                 var fullStudentData = {
                     firstName: studentData.firstName,
                     lastName: studentData.lastName,
@@ -341,21 +367,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     databaseId: dbResult.data?.id || null
                 };
                 
+                // Save to localStorage as backup
                 saveToLocalStorage(fullStudentData);
                 
-                // Stop camera
+                // Stop the camera stream to save resources
                 if (stream) {
-                    stream.getTracks().forEach(function(track) { track.stop(); });
+                    stream.getTracks().forEach(function(track) { 
+                        track.stop(); 
+                    });
                 }
                 
-                // Show success popup and redirect to home
+                // Show success popup and redirect to home page
                 showSuccessPopupAndRedirect();
                 
             } else {
-                // Database save failed
+                // Database save failed - show error message
                 console.error("Database save failed:", dbResult.message);
                 showMessage(dbResult.message + " - Please check your connection.", 'error');
                 
+                // Re-enable the finish button
                 if (finishBtn) {
                     finishBtn.disabled = false;
                     finishBtn.textContent = 'Finish Registration';
@@ -365,6 +395,8 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Registration error:', error);
             showMessage('Error saving registration. Please check your internet connection.', 'error');
+            
+            // Re-enable the finish button
             if (finishBtn) {
                 finishBtn.disabled = false;
                 finishBtn.textContent = 'Finish Registration';
@@ -372,21 +404,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    //EVENT LISTENERS
+    
+    // 10. EVENT LISTENERS - Connect buttons to functions
+     
     if (capturePhotoBtn) capturePhotoBtn.addEventListener('click', capturePhoto);
     if (retakeBtn) retakeBtn.addEventListener('click', retakePhoto);
     if (finishBtn) finishBtn.addEventListener('click', completeRegistration);
     if (manualCaptureBtn) manualCaptureBtn.addEventListener('click', capturePhoto);
     
-    //INITIALIZE
+    
+    // INITIALIZE - Start everything when page loads
+    
     if (loadStudentData()) {
         initCamera();
     }
     
-    // Clean up
+    // Clean up camera when leaving the page
     window.addEventListener('beforeunload', function() {
         if (stream) {
-            stream.getTracks().forEach(function(track) { track.stop(); });
+            stream.getTracks().forEach(function(track) { 
+                track.stop(); 
+            });
         }
     });
+    
 });
