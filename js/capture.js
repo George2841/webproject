@@ -1,5 +1,5 @@
-// This page handles face capture for exam verification
-// It compares the student's current face with the image stored in the database during registration
+// This page handles face capture as part of student registration
+// The student data comes from the registration page, we just add the face image and send everything to the database
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -26,126 +26,60 @@ document.addEventListener('DOMContentLoaded', function() {
     var video = document.getElementById('videoFeed');                 // Camera video feed
     var canvas = document.getElementById('photoCanvas');             // Hidden canvas for image processing
     var captureBtn = document.getElementById('captureBtn');          // The circular capture button
-    var scanStatus = document.getElementById('scanStatus');          // Where we show verification status
-    var studentNameSpan = document.getElementById('studentName');    // Shows student name after verification
-    var eligibilityStatusSpan = document.getElementById('eligibilityStatus'); // Shows eligibility
-    var regNumberInput = document.getElementById('regNumberInput');  // Input field for registration number
-    var verifyRegBtn = document.getElementById('verifyRegBtn');      // Button to verify registration number
-    var regErrorMsg = document.getElementById('regErrorMsg');        // Error message for wrong reg number
-    var regSuccessMsg = document.getElementById('regSuccessMsg');    // Success message for verified reg number
-    var studentNameDisplay = document.getElementById('studentNameDisplay'); // Shows student name after reg verification
-    var verifiedStudentName = document.getElementById('verifiedStudentName'); // Name display element
+    var capturePhotoBtn = document.getElementById('capturePhotoBtn'); // Capture button
+    var retakeBtn = document.getElementById('retakeBtn');             // Retake button
+    var finishBtn = document.getElementById('finishBtn');             // Finish button
+    var previewImage = document.getElementById('previewImage');       // Preview of captured image
+    var capturedPreview = document.getElementById('capturedPreview'); // Preview container
+    var studentNameDisplay = document.getElementById('displayName');   // Shows student name
+    var studentRegDisplay = document.getElementById('displayRegNumber'); // Shows registration number
+    var messageBox = document.getElementById('messageBox');           // Message display area
 
     // Variables to store data while the page is active
-    var stream = null;           // The camera stream
-    var currentStudent = null;   // Stores the student info after registration number is verified
-    var capturedImageData = null; // Stores the captured face image as base64
+    var stream = null;              // The camera stream
+    var capturedImageData = null;   // Stores the captured face image as base64
+    var studentData = null;         // Student data from registration page
 
-    // Backend API address - change this to match your server
+    // Backend API address
     var API_BASE_URL = "http://localhost:8072/api/v1";
 
-    // Helper function to show messages to the user
+    // Show a temporary message to the user
     function showMessage(message, type) {
-        var messageBox = document.getElementById('messageBox');
         if (messageBox) {
             messageBox.textContent = message;
             messageBox.className = 'message ' + type;
             messageBox.style.display = 'block';
-            // Make the message disappear after 3 seconds
             setTimeout(function() {
                 if (messageBox) messageBox.style.display = 'none';
             }, 3000);
         }
     }
 
-    // This function asks the backend to check if the student exists by registration number
-    async function verifyStudentWithDatabase(regNumber) {
+    // Load student data that was saved during registration
+    function loadStudentData() {
         try {
-            var token = localStorage.getItem("jwtToken");
+            studentData = JSON.parse(localStorage.getItem('tempStudentData'));
             
-            console.log("Checking student with registration number:", regNumber);
-            
-            var response = await fetch(API_BASE_URL + "/admin/get/student/" + regNumber, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": token ? "Bearer " + token : ""
-                }
-            });
-            
-            var result = await response.json();
-            console.log("Student verification response:", result);
-            
-            if (response.ok && result.success) {
-                return { verified: true, student: result.data || result.student };
-            } else {
-                return { verified: false, message: result.message || "Student not found" };
+            if (!studentData) {
+                showMessage('No registration data found. Please register first.', 'error');
+                setTimeout(function() {
+                    window.location.href = 'registration.html';
+                }, 2000);
+                return false;
             }
+            
+            // Display student name and registration number on the page
+            if (studentNameDisplay) {
+                studentNameDisplay.textContent = studentData.firstName + ' ' + studentData.lastName;
+            }
+            if (studentRegDisplay) {
+                studentRegDisplay.textContent = studentData.regNumber;
+            }
+            return true;
         } catch (error) {
-            console.error("Network error:", error);
-            return { verified: false, message: "Network error. Please check your connection." };
+            console.error('Error loading student data:', error);
+            return false;
         }
-    }
-
-    // Handle the registration number verification when user clicks the verify button
-    async function handleVerifyStudent() {
-        var regNumber = regNumberInput.value.trim();
-        
-        if (!regNumber) {
-            regErrorMsg.textContent = 'Please enter a registration number';
-            regErrorMsg.classList.add('show');
-            return;
-        }
-        
-        // Show loading state on the button
-        verifyRegBtn.disabled = true;
-        verifyRegBtn.textContent = 'Verifying...';
-        
-        // Ask the backend to verify this student
-        var result = await verifyStudentWithDatabase(regNumber);
-        
-        if (result.verified) {
-            // Student found - store their info
-            currentStudent = result.student;
-            
-            // Update the UI to show success
-            regErrorMsg.classList.remove('show');
-            regSuccessMsg.classList.add('show');
-            studentNameDisplay.classList.add('show');
-            verifiedStudentName.textContent = currentStudent.firstName + ' ' + currentStudent.lastName;
-            regNumberInput.classList.remove('error');
-            
-            // Update the scan status
-            if (scanStatus) {
-                scanStatus.textContent = "Student verified. Please look at the camera and capture your face";
-                scanStatus.className = "status-badge status-success";
-            }
-            
-            // Store the verified student in session storage so we don't have to verify again
-            sessionStorage.setItem('verifiedStudent', JSON.stringify(currentStudent));
-            
-            // Hide the success message after 3 seconds
-            setTimeout(function() {
-                regSuccessMsg.classList.remove('show');
-            }, 3000);
-        } else {
-            // Student not found in the database
-            regErrorMsg.textContent = result.message || 'Student not found. Please register first.';
-            regErrorMsg.classList.add('show');
-            regSuccessMsg.classList.remove('show');
-            studentNameDisplay.classList.remove('show');
-            regNumberInput.classList.add('error');
-            currentStudent = null;
-            
-            if (scanStatus) {
-                scanStatus.textContent = "Student not found. Please register";
-                scanStatus.className = "status-badge status-error";
-            }
-        }
-        
-        // Reset the button
-        verifyRegBtn.disabled = false;
-        verifyRegBtn.textContent = 'Verify Student';
     }
 
     // Start the user's camera
@@ -161,6 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
             stream = streamResult;
             if (video) video.srcObject = stream;
             console.log("Camera ready");
+            showMessage('Camera is ready. Please center your face in the circle and capture.', 'info');
         } catch (err) {
             console.error("Camera error:", err);
             showMessage('Camera access denied. Please allow camera access and refresh the page.', 'error');
@@ -169,12 +104,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Capture the face from the video feed - only the circular area
     function capturePhoto() {
-        // Make sure we have a verified student before allowing face capture
-        if (!currentStudent) {
-            showMessage('Please verify your registration number first', 'error');
-            return;
-        }
-        
         // Make sure camera is ready
         if (!video || !video.srcObject || !stream) {
             showMessage('Camera not ready. Please wait...', 'error');
@@ -212,17 +141,19 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.drawImage(video, circleX, circleY, circleSize, circleSize, 0, 0, canvas.width, canvas.height);
             ctx.restore();
             
-            // Save the captured image as base64 so we can send it to the server
+            // Save the captured image as base64
             capturedImageData = canvas.toDataURL('image/jpeg', 0.9);
             
-            // Update the UI
-            if (scanStatus) {
-                scanStatus.textContent = "Face captured. Verifying with database...";
-                scanStatus.className = "status-badge status-waiting";
-            }
+            // Show preview
+            if (previewImage) previewImage.src = capturedImageData;
+            if (capturedPreview) capturedPreview.style.display = 'block';
             
-            // Now compare this face with the one stored in the database
-            compareFaceWithDatabase();
+            // Update button visibility
+            if (capturePhotoBtn) capturePhotoBtn.style.display = 'none';
+            if (retakeBtn) retakeBtn.style.display = 'block';
+            if (finishBtn) finishBtn.style.display = 'block';
+            
+            showMessage('Face captured successfully! Click "Finish Registration" to complete.', 'success');
             
         } catch (error) {
             console.error('Capture error:', error);
@@ -230,26 +161,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // This function sends the captured face to the backend and asks it to compare with the stored image
-    async function compareFaceWithDatabase() {
-        if (!currentStudent || !capturedImageData) {
-            showMessage('Missing student information or face image', 'error');
-            return;
-        }
-        
+    // Allow user to retake the photo
+    function retakePhoto() {
+        capturedImageData = null;
+        if (capturedPreview) capturedPreview.style.display = 'none';
+        if (previewImage) previewImage.src = '';
+        if (capturePhotoBtn) capturePhotoBtn.style.display = 'block';
+        if (retakeBtn) retakeBtn.style.display = 'none';
+        if (finishBtn) finishBtn.style.display = 'none';
+        showMessage('Position your face in the circle and capture again.', 'info');
+    }
+
+    // Send student data and face image together to the backend database
+    async function sendToDatabase(studentData, capturedImageData) {
         try {
             var token = localStorage.getItem("jwtToken");
             
-            // Prepare the data to send to the server
+            // Prepare the data to send to the server - includes all registration info plus the face image
             var payload = {
-                regNumber: currentStudent.regNumber || currentStudent.regNumber,
+                firstName: studentData.firstName,
+                lastName: studentData.lastName,
+                regNumber: studentData.regNumber,
+                studentEmail: studentData.email,
+                department: studentData.department,
+                faculty: studentData.faculty,
+                yearOfStudy: studentData.yearOfStudy,
                 image: capturedImageData
             };
             
-            console.log("Comparing face for student:", currentStudent.regNumber);
+            console.log("Sending complete student data with face image to database...");
+            console.log("Payload:", payload);
             
-            // Send to backend for face comparison
-            var response = await fetch(API_BASE_URL + "/admin/verify/face", {
+            // Make the API call to save everything
+            var response = await fetch(API_BASE_URL + "/admin/create/student", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -258,117 +202,257 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify(payload)
             });
             
-            var result = await response.json();
-            console.log("Face comparison response:", result);
+            console.log("Response Status:", response.status);
             
-            if (response.ok && result.success && result.match === true) {
-                // Face matched successfully
-                if (scanStatus) {
-                    scanStatus.textContent = "Verified - Student matches database record";
-                    scanStatus.className = "status-badge status-success";
+            var result = await response.json();
+            console.log("Backend Response:", result);
+            
+            if (response.ok && result.success) {
+                return { success: true, data: result, message: "Student registered successfully!" };
+            } else {
+                return { success: false, message: result.message || "Failed to save student to database" };
+            }
+            
+        } catch (error) {
+            console.error("Network Error:", error);
+            return { success: false, message: error.message || "Network error. Please check your connection." };
+        }
+    }
+
+    
+
+    // Show beautiful success popup before redirecting to home page
+    function showSuccessPopupAndRedirect(studentData) {
+        // Create the popup overlay element
+        var popupOverlay = document.createElement('div');
+        popupOverlay.className = 'success-popup-overlay';
+        
+        // Create the popup content
+        popupOverlay.innerHTML = `
+            <div class="success-popup">
+                <div class="success-popup-icon">🎉</div>
+                <h2 class="success-popup-title">Registration Complete!</h2>
+                <p class="success-popup-message">Your account has been created successfully</p>
+                <div class="success-popup-details">
+                    <p><strong>Name:</strong> ${studentData.firstName} ${studentData.lastName}</p>
+                    <p><strong>Registration Number:</strong> ${studentData.regNumber}</p>
+                    <p><strong>Email:</strong> ${studentData.email}</p>
+                    <p><strong>Department:</strong> ${studentData.department}</p>
+                    <p><strong>Year of Study:</strong> ${studentData.yearOfStudy}</p>
+                    <p><strong>Faculty:</strong> ${studentData.faculty}</p>
+                </div>
+                <div class="success-popup-progress">
+                    <div class="progress-bar"></div>
+                </div>
+                <p class="success-popup-redirect">Redirecting to home page...</p>
+            </div>
+        `;
+        
+        // Add the popup to the page
+        document.body.appendChild(popupOverlay);
+        
+        // Add CSS styles for the popup if they don't exist yet
+        if (!document.querySelector('#successPopupStyles')) {
+            var popupStyles = document.createElement('style');
+            popupStyles.id = 'successPopupStyles';
+            popupStyles.textContent = `
+                .success-popup-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.85);
+                    backdrop-filter: blur(8px);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 20000;
+                    animation: fadeInPopup 0.3s ease;
                 }
                 
-                // Show student information
-                var studentInfo = document.getElementById('studentInfo');
-                var eligibilityInfo = document.getElementById('eligibilityInfo');
-                
-                if (studentInfo) studentInfo.style.display = "flex";
-                if (eligibilityInfo) eligibilityInfo.style.display = "flex";
-                if (studentNameSpan) studentNameSpan.textContent = currentStudent.firstName + ' ' + currentStudent.lastName + ' (' + currentStudent.regNumber + ')';
-                if (eligibilityStatusSpan) {
-                    eligibilityStatusSpan.textContent = "Eligible - Examination Access Granted";
-                    eligibilityStatusSpan.style.color = "#059669";
+                .success-popup {
+                    background: white;
+                    border-radius: 28px;
+                    padding: 40px;
+                    max-width: 500px;
+                    width: 90%;
+                    text-align: center;
+                    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+                    animation: slideUpPopup 0.5s ease;
                 }
                 
-                // Mark attendance in the database
-                await markAttendance(currentStudent.regNumber);
+                .success-popup-icon {
+                    font-size: 75px;
+                    margin-bottom: 15px;
+                    animation: bounceIcon 0.6s ease;
+                }
                 
-                showMessage('Face verified successfully! You are eligible for the exam.', 'success');
+                .success-popup-title {
+                    font-size: 28px;
+                    color: #1f2937;
+                    margin-bottom: 10px;
+                    font-weight: 700;
+                }
+                
+                .success-popup-message {
+                    font-size: 16px;
+                    color: #6b7280;
+                    margin-bottom: 25px;
+                }
+                
+                .success-popup-details {
+                    background: linear-gradient(135deg, #f8f9fa 0%, #f3f4f6 100%);
+                    border-radius: 16px;
+                    padding: 18px;
+                    margin-bottom: 25px;
+                    text-align: left;
+                    border: 1px solid #e5e7eb;
+                }
+                
+                .success-popup-details p {
+                    margin: 10px 0;
+                    font-size: 14px;
+                    color: #374151;
+                }
+                
+                .success-popup-details p strong {
+                    color: #667eea;
+                    min-width: 140px;
+                    display: inline-block;
+                }
+                
+                .success-popup-progress {
+                    background: #e5e7eb;
+                    border-radius: 10px;
+                    height: 6px;
+                    overflow: hidden;
+                    margin-bottom: 15px;
+                }
+                
+                .progress-bar {
+                    width: 0%;
+                    height: 100%;
+                    background: linear-gradient(90deg, #10b981, #059669);
+                    border-radius: 10px;
+                    animation: progressBar 2.5s linear forwards;
+                }
+                
+                .success-popup-redirect {
+                    font-size: 13px;
+                    color: #9ca3af;
+                    margin-top: 10px;
+                }
+                
+                @keyframes fadeInPopup {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                
+                @keyframes slideUpPopup {
+                    from { transform: translateY(50px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+                
+                @keyframes bounceIcon {
+                    0% { transform: scale(0); }
+                    50% { transform: scale(1.2); }
+                    100% { transform: scale(1); }
+                }
+                
+                @keyframes progressBar {
+                    0% { width: 0%; }
+                    100% { width: 100%; }
+                }
+            `;
+            document.head.appendChild(popupStyles);
+        }
+        
+        // Stop the camera stream
+        if (stream) {
+            stream.getTracks().forEach(function(track) { 
+                track.stop(); 
+            });
+        }
+        
+        // Remove the popup and redirect to home page after 3 seconds
+        setTimeout(function() {
+            popupOverlay.remove();
+            window.location.href = 'index.html';
+        }, 3000);
+    }
+
+    // Complete the registration process - sends everything to database
+    async function completeRegistration() {
+        // Make sure a face has been captured
+        if (!capturedImageData) {
+            showMessage('Please capture your face first!', 'error');
+            return;
+        }
+        
+        // Disable the finish button to prevent double submission
+        if (finishBtn) {
+            finishBtn.disabled = true;
+            finishBtn.textContent = 'Processing...';
+        }
+        
+        showMessage('Saving your registration to the database...', 'info');
+        
+        try {
+            // Send student data AND face image together to the backend database
+            var dbResult = await sendToDatabase(studentData, capturedImageData);
+            
+            if (dbResult.success) {
+                console.log("Database save successful:", dbResult);
+                
+                // Prepare complete student data for localStorage backup
+                var fullStudentData = {
+                    firstName: studentData.firstName,
+                    lastName: studentData.lastName,
+                    regNumber: studentData.regNumber,
+                    email: studentData.email,
+                    department: studentData.department,
+                    yearOfStudy: studentData.yearOfStudy,
+                    faculty: studentData.faculty,
+                    faceImage: capturedImageData,
+                    registrationDate: new Date().toISOString(),
+                    status: 'active',
+                    syncedToDatabase: true
+                };
+                
+                // Save to localStorage as backup
+                saveToLocalStorage(fullStudentData);
+                
+                // Show success popup and redirect to home page
+                showSuccessPopupAndRedirect(studentData);
                 
             } else {
-                // Face did not match
-                if (scanStatus) {
-                    scanStatus.textContent = "Verification Failed - Face does not match records";
-                    scanStatus.className = "status-badge status-error";
+                // Database save failed
+                console.error("Database save failed:", dbResult.message);
+                showMessage(dbResult.message + " - Please check your connection.", 'error');
+                
+                // Re-enable the finish button
+                if (finishBtn) {
+                    finishBtn.disabled = false;
+                    finishBtn.textContent = 'Finish Registration';
                 }
-                
-                var studentInfo = document.getElementById('studentInfo');
-                var eligibilityInfo = document.getElementById('eligibilityInfo');
-                
-                if (studentInfo) studentInfo.style.display = "none";
-                if (eligibilityInfo) eligibilityInfo.style.display = "none";
-                
-                showMessage('Face verification failed. Please make sure you are the registered student.', 'error');
-                
-                // Reset after 3 seconds so they can try again
-                setTimeout(function() {
-                    if (scanStatus) {
-                        scanStatus.textContent = "Ready to scan";
-                        scanStatus.className = "status-badge status-waiting";
-                    }
-                    capturedImageData = null;
-                }, 3000);
             }
             
         } catch (error) {
-            console.error("Face comparison error:", error);
-            showMessage('Network error. Please check your connection.', 'error');
-            if (scanStatus) {
-                scanStatus.textContent = "Network error - Please try again";
-                scanStatus.className = "status-badge status-error";
+            console.error('Registration error:', error);
+            showMessage('Error saving registration. Please check your internet connection.', 'error');
+            
+            // Re-enable the finish button
+            if (finishBtn) {
+                finishBtn.disabled = false;
+                finishBtn.textContent = 'Finish Registration';
             }
         }
     }
 
-    // Mark attendance in the database after successful face verification
-    async function markAttendance(regNumber) {
-        try {
-            var token = localStorage.getItem("jwtToken");
-            
-            var payload = {
-                regNumber: regNumber,
-                timestamp: new Date().toISOString(),
-                status: "present"
-            };
-            
-            var response = await fetch(API_BASE_URL + "/admin/mark-attendance", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": token ? "Bearer " + token : ""
-                },
-                body: JSON.stringify(payload)
-            });
-            
-            var result = await response.json();
-            console.log("Attendance marked:", result);
-            
-        } catch (error) {
-            console.error("Attendance marking error:", error);
-            
-        }
-    }
-
-    // Check if we already have a verified student in session 
-    function checkExistingSession() {
-        var savedVerifiedStudent = sessionStorage.getItem('verifiedStudent');
-        if (savedVerifiedStudent) {
-            var student = JSON.parse(savedVerifiedStudent);
-            currentStudent = student;
-            regNumberInput.value = student.regNumber;
-            verifiedStudentName.textContent = student.firstName + ' ' + student.lastName;
-            studentNameDisplay.classList.add('show');
-            if (scanStatus) {
-                scanStatus.textContent = "Student verified. Please look at the camera and capture your face";
-                scanStatus.className = "status-badge status-success";
-            }
-        }
-    }
-
-    // Set up all the event listeners for buttons
+    // Set up all the event listeners
     if (captureBtn) {
         captureBtn.addEventListener('click', function() {
-            // Add click animation
             captureBtn.style.transform = "scale(0.95)";
             setTimeout(function() {
                 captureBtn.style.transform = "";
@@ -377,33 +461,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    if (verifyRegBtn) {
-        verifyRegBtn.addEventListener('click', handleVerifyStudent);
+    if (capturePhotoBtn) {
+        capturePhotoBtn.addEventListener('click', capturePhoto);
     }
     
-    if (regNumberInput) {
-        // Allow pressing Enter to verify
-        regNumberInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                handleVerifyStudent();
-            }
-        });
-        
-        // Clear error styling when user starts typing
-        regNumberInput.addEventListener('input', function() {
-            regNumberInput.classList.remove('error');
-            regErrorMsg.classList.remove('show');
-        });
+    if (retakeBtn) {
+        retakeBtn.addEventListener('click', retakePhoto);
+    }
+    
+    if (finishBtn) {
+        finishBtn.addEventListener('click', completeRegistration);
     }
 
-    // Check if we already have a student from before
-    checkExistingSession();
+    // Load student data from registration page and start camera
+    if (loadStudentData()) {
+        initCamera();
+    }
     
-    // Start the camera
-    initCamera();
-    
-    // Clean up the camera when leaving the page to save resources
+    // Clean up camera when leaving the page
     window.addEventListener('beforeunload', function() {
         if (stream) {
             stream.getTracks().forEach(function(track) { 
