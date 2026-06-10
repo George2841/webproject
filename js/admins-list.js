@@ -1,10 +1,8 @@
 
-// ADMIN LIST PAGE - Manages all administrator records
-
+// Fetches data from backend database 
 
 // Wait for the page to fully load before running any code
 document.addEventListener('DOMContentLoaded', function() {
-    
     
     // CLOCK FUNCTION - Shows current time in the navigation bar
     
@@ -25,8 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(updateClock, 1000);
     updateClock();  // Call once immediately so it doesn't wait a second
     
-    
-    // MOBILE MENU - Handles the hamburger menu on small screens
+    // 2. MOBILE MENU - Handles the hamburger menu on small screens
     
     window.toggleMenu = function() {
         var mobileMenu = document.getElementById('mobileMenu');
@@ -48,6 +45,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // API CONFIGURATION - Backend connection settings
+    var API_BASE_URL = "http://localhost:8072/api/v1";  
+    
     
     // DOM ELEMENTS - Get references to all HTML elements we'll need
     
@@ -59,41 +59,94 @@ document.addEventListener('DOMContentLoaded', function() {
     var pageInfo = document.getElementById('pageInfo');                // Shows current page number
     
     
-    // GLOBAL VARIABLES - Track the state of the page
+    //  GLOBAL VARIABLES - Track the state of the page
     
-    var admins = [];              // Array to hold all administrator records
+    var admins = [];              // Array to hold all administrator records from database
     var currentFilter = 'all';    // Current filter: 'all', 'active', or 'inactive'
     var currentPage = 1;          // Current page number for pagination
     var rowsPerPage = 10;         // Number of records to show per page
     var searchTerm = '';          // Text entered in the search box
+    var isLoading = false;        // Flag to prevent multiple simultaneous requests
     
     
-    // LOAD DATA - Get admin records from browser storage
-    
-    function loadAdmins() {
-        var savedAdmins = localStorage.getItem('admins');  // Try to get saved data
+    // FETCH ADMINS FROM BACKEND DATABASE 
+    async function fetchAdminsFromDatabase() {
+        // Prevent multiple requests at the same time
+        if (isLoading) return;
+        isLoading = true;
         
-        // If we have existing data, use it
-        if (savedAdmins && JSON.parse(savedAdmins).length > 0) {
-            admins = JSON.parse(savedAdmins);
-            console.log("Admins loaded from localStorage:", admins.length);
-        } else {
-            // No data found - this happens on first time use
-            // In a real app, you would fetch from backend API here
-            console.log("No admin data found");
-            admins = [];  // Start with empty array
+        // Show loading state in the table
+        if (adminsTableBody) {
+            adminsTableBody.innerHTML = '<tr><td colspan="10" style="text-align: center;">⏳ Loading administrators from database...</td></tr>';
         }
         
-        updateStatsSummary();   // Refresh the statistics display
-        renderAdminsTable();    // Refresh the table with data
+        try {
+            // Get the authentication token from storage 
+            var token = localStorage.getItem('jwtToken') || localStorage.getItem('authToken');
+            
+            // Prepare the API endpoint with optional search parameter
+            var url = API_BASE_URL + "/admin/get/all/admins";
+            
+            // If there's a search term, add it to the URL
+            if (searchTerm.trim() !== '') {
+                url = API_BASE_URL + "/admin/search/admins?search=" + encodeURIComponent(searchTerm);
+            }
+            
+            console.log("Fetching admins from:", url);
+            
+            // Make the API call to fetch all admins
+            var response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": token ? "Bearer " + token : ""
+                }
+            });
+            
+            // Check if the request was successful
+            if (!response.ok) {
+                throw new Error("Failed to fetch admins: " + response.status);
+            }
+            
+            // Parse the response data
+            var result = await response.json();
+            console.log("Admins fetched from database:", result);
+            
+            // Extract the admins array from the response 
+            if (result.success && result.data) {
+                admins = result.data; 
+            } else if (Array.isArray(result)) {
+                admins = result;  
+            } else if (result.admins) {
+                admins = result.admins;  
+            } else {
+                admins = [];
+                console.warn("Unexpected API response format:", result);
+            }
+            
+            console.log("Loaded " + admins.length + " administrators from database");
+            
+        } catch (error) {
+            console.error("Error fetching admins from database:", error);
+            // Show error message in the table
+            if (adminsTableBody) {
+                adminsTableBody.innerHTML = '<tr><td colspan="10" style="text-align: center;">❌ Error loading administrators. Please check your connection.</td></tr>';
+            }
+            showToast("Failed to load administrators from database", "error");
+            admins = [];  // Reset to empty array on error
+        } finally {
+            isLoading = false;
+            updateStatsSummary();   // Refresh the statistics display
+            renderAdminsTable();    // Refresh the table with data
+        }
     }
     
-    
-    // UPDATE STATISTICS - Shows total, active, and inactive counts
-    
+    // UPDATE STATISTICS 
     function updateStatsSummary() {
         var total = admins.length;
-        var active = admins.filter(function(a) { return a.status === 'active'; }).length;
+        var active = admins.filter(function(a) { 
+            return a.status === 'active' || a.status === 'ACTIVE'; 
+        }).length;
         var inactive = total - active;
         
         if (statsSummary) {
@@ -105,37 +158,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    
-    // FILTER ADMINS - Apply search and status filters to the data
-    
+    // FILTER ADMINS - Apply status filters to the data 
     function getFilteredAdmins() {
-        var filtered = admins;  // Start with all admins
+        var filtered = admins;  // Start with all admins from database
         
         // Apply status filter (active/inactive/all)
-        if (currentFilter === 'active') {
-            filtered = filtered.filter(function(a) { return a.status === 'active'; });
-        } else if (currentFilter === 'inactive') {
-            filtered = filtered.filter(function(a) { return a.status === 'inactive'; });
-        }
         
-        // Apply search filter (if user typed something)
-        if (searchTerm.trim() !== '') {
-            var term = searchTerm.toLowerCase().trim();
-            filtered = filtered.filter(function(a) {
-                var fullName = (a.firstName || '') + ' ' + (a.lastName || '');
-                return fullName.toLowerCase().includes(term) ||
-                       (a.employeeNumber && a.employeeNumber.toLowerCase().includes(term)) ||
-                       (a.email && a.email.toLowerCase().includes(term)) ||
-                       (a.department && a.department.toLowerCase().includes(term));
+        if (currentFilter === 'active') {
+            filtered = filtered.filter(function(a) { 
+                return a.status === 'active' || a.status === 'ACTIVE'; 
+            });
+        } else if (currentFilter === 'inactive') {
+            filtered = filtered.filter(function(a) { 
+                return a.status !== 'active' && a.status !== 'ACTIVE'; 
             });
         }
         
         return filtered;
     }
     
-    
     // RENDER TABLE - Display the admin records in the HTML table
-    
     function renderAdminsTable() {
         if (!adminsTableBody) return;
         
@@ -153,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Show message if no records found
         if (pageAdmins.length === 0) {
-            adminsTableBody.innerHTML = '<tr><td colspan="10" style="text-align: center;">No administrators found</td></tr>';
+            adminsTableBody.innerHTML = '<tr><td colspan="10" style="text-align: center;">👨‍💼 No administrators found</td></tr>';
             updatePaginationButtons(0, 0);
             return;
         }
@@ -167,13 +209,30 @@ document.addEventListener('DOMContentLoaded', function() {
             var row = document.createElement('tr');
             
             var serialNumber = start + i + 1;
-            var fullName = (admin.firstName || '') + ' ' + (admin.lastName || '');
-            var employeeNumber = admin.employeeNumber || 'N/A';
+            var fullName = (admin.firstName || admin.first_name || '') + ' ' + (admin.lastName || admin.last_name || '');
+            var employeeNumber = admin.employeeNumber || admin.employee_number || admin.staffId || 'N/A';
             var email = admin.email || 'N/A';
-            var phoneNumber = admin.phoneNumber || 'N/A';
+            var phoneNumber = admin.phoneNumber || admin.phone || 'N/A';
             var department = admin.department || 'N/A';
+<<<<<<< HEAD
             var position = admin.position || 'N/A';
             var createdOn= admin.createdOn|| 'N/A';
+=======
+            var position = admin.position || admin.role || 'N/A';
+            var status = admin.status || 'active';
+            var statusClass = (status === 'active' || status === 'ACTIVE') ? 'status-active' : 'status-inactive';
+            var statusText = (status === 'active' || status === 'ACTIVE') ? 'Active' : 'Inactive';
+            var regDate = admin.registrationDate || admin.createdAt || admin.createdOn || admin.created_at || 'N/A';
+            
+            // Format date if it's a valid date string
+            if (regDate !== 'N/A') {
+                try {
+                    regDate = new Date(regDate).toLocaleDateString();
+                } catch(e) {
+                    regDate = 'N/A';
+                }
+            }
+>>>>>>> dd195b0abaf4315ecc5783dcfef3381d3e3a437e
             
             // Build the row HTML
             row.innerHTML = `
@@ -187,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                 <td>${regDate}</td>
                 <td class="action-buttons">
-                    <button class="btn-delete" onclick="deleteAdmin(${admin.id})">Delete</button>
+                    <button class="btn-delete" onclick="deleteAdmin('${admin.id || admin._id}')">🗑️ Delete</button>
                 </td>
             `;
             adminsTableBody.appendChild(row);
@@ -196,8 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePaginationButtons(currentPage, totalPages);
     }
     
-    
-    // 9. PAGINATION - Handle previous/next page buttons
+    // PAGINATION - Handle previous/next page buttons
     
     function updatePaginationButtons(current, total) {
         // Disable previous button if we're on the first page
@@ -216,7 +274,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    
     // HELPER FUNCTION - Prevent HTML injection attacks
     
     function escapeHtml(text) {
@@ -228,7 +285,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     
     // SETUP FILTER BUTTONS - Handle clicks on status filters
-    
     function setupFilterButtons() {
         var filterBtns = document.querySelectorAll('.filter-btn');
         filterBtns.forEach(function(btn) {
@@ -244,23 +300,30 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-    
-    
-    // SETUP SEARCH - Handle typing in the search box
-    
+    // SETUP SEARCH 
     function setupSearch() {
         if (searchInput) {
+            // Use debounce to avoid too many API calls while user is typing
+            var debounceTimer;
+            
             searchInput.addEventListener('input', function() {
-                searchTerm = this.value;    // Update search term as user types
-                currentPage = 1;             // Reset to first page when searching
-                renderAdminsTable();         // Refresh the table with filtered results
+                // Clear the previous timer
+                clearTimeout(debounceTimer);
+                
+                // Update search term
+                searchTerm = this.value;
+                currentPage = 1;
+                
+                // Wait 500ms after user stops typing before making the API call
+                debounceTimer = setTimeout(function() {
+                    // Fetch fresh data from database with the search term
+                    fetchAdminsFromDatabase();
+                }, 500);
             });
         }
     }
     
-    
     // SETUP PAGINATION - Handle next/previous button clicks
-    
     function setupPagination() {
         // Previous page button
         if (prevPageBtn) {
@@ -285,37 +348,49 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    //  DELETE ADMIN - Remove an admin from the database
     
-    // DELETE ADMIN - Remove an admin from the system
-    
-    window.deleteAdmin = function(id) {
+    window.deleteAdmin = async function(id) {
         // Ask for confirmation before deleting
-        var userConfirmed = confirm('Are you sure you want to delete this administrator? This action cannot be undone.');
+        var userConfirmed = confirm('⚠️ Are you sure you want to delete this administrator? This action cannot be undone.');
         
-        if (userConfirmed) {
-            // Remove the admin from the array
-            admins = admins.filter(function(a) { return a.id !== id; });
+        if (!userConfirmed) return;
+        
+        try {
+            // Get the authentication token
+            var token = localStorage.getItem('jwtToken') || localStorage.getItem('authToken');
             
-            // Save the updated list back to localStorage
-            localStorage.setItem('admins', JSON.stringify(admins));
+            // Show loading state on the delete button
+            showToast('Deleting administrator...', 'info');
             
-            // Fix page number if current page is now empty
-            var filtered = getFilteredAdmins();
-            var totalPages = Math.ceil(filtered.length / rowsPerPage);
-            if (currentPage > totalPages && currentPage > 1) {
-                currentPage--;
+            // Make API call to delete the admin
+            var response = await fetch(API_BASE_URL + "/admin/delete/" + id, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": token ? "Bearer " + token : ""
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error("Failed to delete admin: " + response.status);
             }
             
-            // Refresh the display
-            updateStatsSummary();
-            renderAdminsTable();
+            var result = await response.json();
+            console.log("Delete response:", result);
+            
+            // Refresh the admin list from database
+            await fetchAdminsFromDatabase();
+            
             showToast('Admin deleted successfully!', 'success');
+            
+        } catch (error) {
+            console.error("Error deleting admin:", error);
+            showToast('Failed to delete admin. Please try again.', 'error');
         }
     };
     
-    
     // TOAST NOTIFICATION - Show temporary popup messages
-    
     function showToast(message, type) {
         // Remove any existing toast to avoid duplicates
         var existingToast = document.querySelector('.toast-notification');
@@ -352,6 +427,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 .toast-notification.error {
                     border-left: 4px solid #ef4444;
                 }
+                .toast-notification.info {
+                    border-left: 4px solid #2196f3;
+                }
                 .toast-notification button {
                     background: none;
                     border: none;
@@ -374,14 +452,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     
-    // INITIALIZE - Start everything when page loads
+    // REFRESH BUTTON - Manually refresh data from database
+    function setupRefreshButton() {
+        var refreshBtn = document.getElementById('refreshAdminsBtn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', function() {
+                fetchAdminsFromDatabase();
+                showToast('Refreshing admin list...', 'info');
+            });
+        }
+    }
     
-    function init() {
+    // INITIALIZE - Start everything when page loads
+    async function init() {
         setupFilterButtons();   // Set up the filter button clicks
-        setupSearch();          // Set up the search box
+        setupSearch();          // Set up the real-time search box
         setupPagination();      // Set up the pagination buttons
-        loadAdmins();           // Load the admin data
-        console.log("Admins List page loaded successfully");
+        setupRefreshButton();   // Set up the refresh button (if exists)
+        await fetchAdminsFromDatabase();  // Load admin data from database
+        console.log(" Admins List page loaded successfully - fetching from database");
     }
     
     // Start the application
