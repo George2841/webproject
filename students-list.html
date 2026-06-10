@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registered Students</title>
+    
+    <link rel="stylesheet" href="css/students-list.css">
+</head>
+<body>
+    <!-- NAVIGATION BAR -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="scan.html" class="nav-link">Face Scan</a></li>
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li><a href="registration.html" class="nav-link">Registration</a></li>
+            </ul>
+            <div class="nav-right">
+                <span class="nav-time" id="navClock">--:--:--</span>
+                
+            </div>
+            <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="index.html">Home</a>
+            <a href="scan.html">Face Scan</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="registration.html">Registration</a>
+            <a href="students-list.html" class="active">Students List</a>
+            <a href="scan.html" class="btn btn-primary" style="margin-top:8px">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="students-container">
+        <div class="back-button">
+            <a href="dashboard.html" class="back-btn">Back to Dashboard</a>
+        </div>
+        
+        <div class="students-card">
+            <div class="students-header">
+                <h1>Registered Students</h1>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All Students</button>
+                    <button class="filter-btn" data-filter="verified">Verified</button>
+                    <button class="filter-btn" data-filter="pending">Pending</button>
+                </div>
+            </div>
+
+            <div class="stats-summary" id="statsSummary">
+                <div class="stat-pill">Loading statistics...</div>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by name, reg number, or email...">
+            </div>
+
+            <div class="students-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Registration Number</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Year</th>
+                            <th>Faculty</th>
+                            <th>Status</th>
+                            <th>Registered On</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <tr>
+                            <td colspan="9" style="text-align: center;">Loading students...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination" id="pagination">
+                <button class="page-btn" id="prevPage" disabled>Previous</button>
+                <span id="pageInfo">Page 1</span>
+                <button class="page-btn" id="nextPage">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <p class="footer-desc">
+                        Facial recognition system for secure, contactless exam
+                        eligibility verification in academic institutions.
+                    </p>
+                </div>
+                <div class="footer-links-group">
+                    <div class="footer-col">
+                        <div class="footer-col-title">System</div>
+                        <a href="scan.html" class="footer-link">Face Scan</a>
+                        <a href="dashboard.html" class="footer-link">Dashboard</a>
+                        <a href="students-list.html" class="footer-link">Students List</a>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2024 FacialRecog System. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/students-list.js"></script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admins List</title>
+    
+    <link rel="stylesheet" href="css/admins-list.css">
+</head>
+<body>
+    <!-- NAVIGATION BAR -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                
+                <li><a href="register-admin.html" class="nav-link">Register Admin</a></li>
+                <li><a href="admins-list.html" class="nav-link active">Admins List</a></li>
+            </ul>
+            <div class="nav-right">
+                <span class="nav-time" id="navClock">--:--:--</span>
+               
+            </div>
+            <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="index.html">Home</a>
+            <a href="scan.html">Face Scan</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="registration.html">Registration</a>
+            <a href="register-admin.html">Register Admin</a>
+            <a href="admins-list.html" class="active">Admins List</a>
+            
+           
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="admins-container">
+        <div class="back-button">
+            <a href="dashboard.html" class="back-btn">Back to Dashboard</a>
+        </div>
+
+        <div class="admins-card">
+            <div class="admins-header">
+                <h1>System Administrators</h1>
+                <p>Manage and view all registered system administrators</p>
+            </div>
+
+            <div class="stats-summary" id="statsSummary">
+                <div class="stat-pill">Loading statistics...</div>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by name, employee number, or email...">
+                <button class="add-admin-btn" onclick="window.location.href='register-admin.html'">
+                    Register New Admin
+                </button>
+            </div>
+
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">All Admins</button>
+                <button class="filter-btn" data-filter="active">Active</button>
+                <button class="filter-btn" data-filter="inactive">Inactive</button>
+            </div>
+
+            <div class="admins-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Employee No</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Department</th>
+                            <th>Position</th>
+                            <th>Status</th>
+                            <th>Registered On</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminsTableBody">
+                        <tr>
+                            <td colspan="10" style="text-align: center;">Loading administrators...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination" id="pagination">
+                <button class="page-btn" id="prevPage" disabled>Previous</button>
+                <span id="pageInfo">Page 1</span>
+                <button class="page-btn" id="nextPage">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-bottom">
+                <span>© 2024 Facial Recognition System. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/admins-list.js"></script>
+   
+</body>
+</html>

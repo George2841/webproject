@@ -1,4 +1,4 @@
-//DASHBOARD PAGE JAVASCRIPT
+//  DASHBOARD PAGE JAVASCRIPT 
 
 // DOM Elements
 const totalScansEl = document.getElementById('totalScans');
@@ -19,25 +19,26 @@ let scanHistory = [];
 let currentStudent = {
     name: "GEORGE OTIENO",
     id: "BIT/0074/23",
-    course: "IT",
-    eligible: true
+    course: "Information Technology",
+    eligible: true,
+    email: "george.otieno@university.ac.ke"
 };
 
-//LIVE CLOCK FUNCTION
+//  LIVE CLOCK FUNCTION 
 function updateClock() {
     const now = new Date();
-    const timeString = now.toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit' 
-    });
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const timeString = `${hours}:${minutes}:${seconds}`;
+    
     const clockElement = document.getElementById('navClock');
     if (clockElement) {
         clockElement.textContent = timeString;
     }
 }
 
-//MOBILE MENU TOGGLE
+//  MOBILE MENU TOGGLE 
 function toggleMenu() {
     const menu = document.getElementById('mobileMenu');
     if (menu) {
@@ -45,7 +46,19 @@ function toggleMenu() {
     }
 }
 
-//LOAD DATA FROM LOCALSTORAGE
+// Close mobile menu when clicking outside
+document.addEventListener('click', function(event) {
+    const mobileMenu = document.getElementById('mobileMenu');
+    const hamburger = document.getElementById('hamburger');
+    
+    if (mobileMenu && mobileMenu.classList.contains('show')) {
+        if (hamburger && !hamburger.contains(event.target) && !mobileMenu.contains(event.target)) {
+            mobileMenu.classList.remove('show');
+        }
+    }
+});
+
+//  LOAD DATA FROM LOCALSTORAGE 
 function loadDashboardData() {
     // Load scan history from localStorage
     const savedScans = localStorage.getItem('scanHistory');
@@ -62,62 +75,25 @@ function loadDashboardData() {
         currentStudent = JSON.parse(savedStudent);
     }
     
+    // Try to get current user from login session
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (currentUser && currentUser.name) {
+        currentStudent.name = currentUser.name;
+        currentStudent.email = currentUser.email;
+        if (currentUser.regNumber) {
+            currentStudent.id = currentUser.regNumber;
+        }
+    }
+    
     // Update all dashboard sections
     updateStatistics();
     updateStudentInfo();
     updateScansTable();
 }
 
-//ADD SAMPLE DATA FOR DEMO
-function addSampleData() {
-    const sampleScans = [
-        {
-            id: 1,
-            dateTime: "Dec 15, 2024 10:30:25",
-            confidence: 94.7,
-            status: "verified",
-            studentName: "GEORGE OTIENO",
-            studentId: "BIT/0074/23"
-        },
-        {
-            id: 2,
-            dateTime: "Dec 14, 2024 14:15:30",
-            confidence: 87.2,
-            status: "verified",
-            studentName: "BAHATI MASITSA",
-            studentId: "BIT/0048/23"
-        },
-        {
-            id: 3,
-            dateTime: "Dec 13, 2026 09:45:10",
-            confidence: 65.3,
-            status: "failed",
-            studentName: "Unknown",
-            studentId: "N/A"
-        },
-        {
-            id: 4,
-            dateTime: "Dec 12, 2026 11:20:45",
-            confidence: 91.5,
-            status: "verified",
-            studentName: "EDGAR KIPROTICH",
-            studentId: "BIT/0022/23"
-        },
-        {
-            id: 5,
-            dateTime: "Dec 11, 2024 16:00:00",
-            confidence: 72.8,
-            status: "failed",
-            studentName: "Unknown",
-            studentId: "N/A"
-        }
-    ];
-    
-    localStorage.setItem('scanHistory', JSON.stringify(sampleScans));
-    scanHistory = sampleScans;
-}
 
-//UPDATE STATISTICS CARDS
+
+//  UPDATE STATISTICS CARDS 
 function updateStatistics() {
     const totalScans = scanHistory.length;
     const verifiedScans = scanHistory.filter(scan => scan.status === 'verified').length;
@@ -134,7 +110,7 @@ function updateStatistics() {
     }
 }
 
-// ANIMATE NUMBER COUNTER
+//  ANIMATE NUMBER COUNTER 
 function animateValue(element, start, end, duration) {
     if (!element) return;
     
@@ -153,7 +129,7 @@ function animateValue(element, start, end, duration) {
     requestAnimationFrame(updateCounter);
 }
 
-//UPDATE STUDENT INFORMATION
+//  UPDATE STUDENT INFORMATION 
 function updateStudentInfo() {
     if (studentNameEl) studentNameEl.textContent = currentStudent.name;
     if (studentIdEl) studentIdEl.textContent = currentStudent.id;
@@ -170,7 +146,7 @@ function updateStudentInfo() {
     }
 }
 
-//UPDATE SCANS HISTORY TABLE
+//  UPDATE SCANS HISTORY TABLE 
 function updateScansTable() {
     if (!scansListEl) return;
     
@@ -186,11 +162,13 @@ function updateScansTable() {
     }
     
     // Display last 10 scans (most recent first)
-    const recentScans = scanHistory.slice(0, 10);
+    const recentScans = [...scanHistory].reverse().slice(0, 10);
     
     scansListEl.innerHTML = recentScans.map(scan => `
         <tr>
             <td>${scan.dateTime}</td>
+            <td>${scan.studentName}</td>
+            <td>${scan.studentId}</td>
             <td>
                 <div class="confidence-bar">
                     <span class="confidence-value">${scan.confidence}%</span>
@@ -213,14 +191,14 @@ function updateScansTable() {
     `).join('');
 }
 
-//GET CONFIDENCE BAR COLOR
+//  GET CONFIDENCE BAR COLOR 
 function getConfidenceColor(confidence) {
     if (confidence >= 85) return '#10b981';
     if (confidence >= 70) return '#f59e0b';
     return '#ef4444';
 }
 
-//VIEW SCAN DETAILS
+//  VIEW SCAN DETAILS 
 function viewScanDetails(scanId) {
     const scan = scanHistory.find(s => s.id === scanId);
     if (!scan) return;
@@ -232,7 +210,7 @@ function viewScanDetails(scanId) {
         <div class="scan-modal-content">
             <div class="scan-modal-header">
                 <h3>Scan Details</h3>
-                <button class="modal-close" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</button>
+                <button class="modal-close" onclick="this.closest('.scan-modal').remove()">&times;</button>
             </div>
             <div class="scan-modal-body">
                 <div class="detail-row">
@@ -248,7 +226,7 @@ function viewScanDetails(scanId) {
                     <span class="detail-value">${scan.studentId}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Confidence:</span>
+                    <span class="detail-label">Confidence Score:</span>
                     <span class="detail-value ${scan.confidence >= 75 ? 'text-success' : 'text-error'}">${scan.confidence}%</span>
                 </div>
                 <div class="detail-row">
@@ -310,6 +288,9 @@ function viewScanDetails(scanId) {
                 cursor: pointer;
                 color: #6b7280;
             }
+            .modal-close:hover {
+                color: #dc2626;
+            }
             .scan-modal-body {
                 padding: 1.5rem;
             }
@@ -318,6 +299,9 @@ function viewScanDetails(scanId) {
                 justify-content: space-between;
                 padding: 0.75rem 0;
                 border-bottom: 1px solid #f3f4f6;
+            }
+            .detail-row:last-child {
+                border-bottom: none;
             }
             .detail-label {
                 font-weight: 600;
@@ -376,7 +360,7 @@ function viewScanDetails(scanId) {
     });
 }
 
-//REFRESH DASHBOARD
+//  REFRESH DASHBOARD 
 function refreshDashboard() {
     // Reload data from localStorage
     const savedScans = localStorage.getItem('scanHistory');
@@ -397,7 +381,7 @@ function refreshDashboard() {
     showToast('Dashboard refreshed successfully!', 'success');
 }
 
-// EXPORT DATA AS CSV
+//  EXPORT DATA AS CSV 
 function exportDashboardData() {
     const headers = ['Date & Time', 'Student Name', 'Student ID', 'Confidence (%)', 'Status'];
     const csvData = scanHistory.map(scan => [
@@ -419,7 +403,7 @@ function exportDashboardData() {
     showToast('Data exported successfully!', 'success');
 }
 
-//CLEAR ALL SCAN HISTORY
+// CLEAR ALL SCAN HISTORY 
 function clearScanHistory() {
     if (confirm('Are you sure you want to clear all scan history? This action cannot be undone.')) {
         localStorage.removeItem('scanHistory');
@@ -430,7 +414,7 @@ function clearScanHistory() {
     }
 }
 
-//TOAST NOTIFICATION
+//  TOAST NOTIFICATION 
 function showToast(message, type) {
     // Remove existing toast
     const existingToast = document.querySelector('.toast-notification');
@@ -445,13 +429,59 @@ function showToast(message, type) {
     `;
     document.body.appendChild(toast);
     
+    // Add toast styles if not exists
+    if (!document.querySelector('#toastStyles')) {
+        const toastStyles = document.createElement('style');
+        toastStyles.id = 'toastStyles';
+        toastStyles.textContent = `
+            .toast-notification {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                z-index: 10001;
+                animation: slideInRight 0.3s ease;
+            }
+            .toast-notification.success {
+                border-left: 4px solid #10b981;
+            }
+            .toast-notification.error {
+                border-left: 4px solid #ef4444;
+            }
+            .toast-notification button {
+                background: none;
+                border: none;
+                font-size: 1.2rem;
+                cursor: pointer;
+                color: #999;
+            }
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(toastStyles);
+    }
+    
     // Auto remove after 3 seconds
     setTimeout(() => {
         if (toast && toast.parentElement) toast.remove();
     }, 3000);
 }
 
-// ADD EXPORT AND CLEAR BUTTONS
+//  ADD EXPORT AND CLEAR BUTTONS 
 function addDashboardButtons() {
     const sectionHeader = document.querySelector('.dashboard-section .section-header');
     if (sectionHeader && !document.querySelector('.dashboard-actions')) {
@@ -459,17 +489,63 @@ function addDashboardButtons() {
         actionsDiv.className = 'dashboard-actions';
         actionsDiv.innerHTML = `
             <button class="btn btn-outline btn-sm" onclick="exportDashboardData()">
-                📥 Export Data
+                Export Data
             </button>
             <button class="btn btn-outline btn-sm" onclick="clearScanHistory()" style="border-color: #ef4444; color: #ef4444;">
-                🗑️ Clear History
+                Clear History
             </button>
+            <a href="register-admin.html" class="btn btn-outline btn-sm" style="border-color: #f59e0b; color: #f59e0b;">
+                Register Admin
+            </a>
         `;
         sectionHeader.appendChild(actionsDiv);
     }
 }
 
-//INITIALIZE DASHBOARD
+//  CHECK USER ROLE 
+function checkUserRole() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const userRoleSpan = document.getElementById('userRole');
+    const registerAdminLinks = document.querySelectorAll('a[href="register-admin.html"]');
+    
+    if (currentUser.role === 'super_admin' || currentUser.role === 'admin') {
+        if (userRoleSpan) {
+            userRoleSpan.textContent = currentUser.role === 'super_admin' ? 'Super Admin' : 'Admin';
+        }
+        // Show admin registration links
+        registerAdminLinks.forEach(link => {
+            link.style.display = 'inline-block';
+        });
+    } else {
+        if (userRoleSpan) {
+            userRoleSpan.textContent = 'Student';
+        }
+        // Hide admin registration for regular students
+        registerAdminLinks.forEach(link => {
+            link.style.display = 'none';
+        });
+    }
+}
+
+//  UPDATE EXAMS LIST 
+function updateExamsList() {
+    const examsListEl = document.getElementById('examsList');
+    if (!examsListEl) return;
+    
+   
+    
+    examsListEl.innerHTML = exams.map(exam => `
+        <tr>
+            <td>${exam.name}</td>
+            <td>${exam.date}</td>
+            <td>${exam.time}</td>
+            <td>${exam.venue}</td>
+            <td><span class="status-badge status-upcoming">Upcoming</span></td>
+        </tr>
+    `).join('');
+}
+
+//  INITIALIZE DASHBOARD 
 function initDashboard() {
     // Start clock
     updateClock();
@@ -478,16 +554,22 @@ function initDashboard() {
     // Load dashboard data
     loadDashboardData();
     
+    // Update exams list
+    updateExamsList();
+    
     // Add export and clear buttons
     addDashboardButtons();
+    
+    // Check user role
+    checkUserRole();
     
     // Add refresh button event
     if (refreshBtn) {
         refreshBtn.addEventListener('click', refreshDashboard);
     }
     
-    console.log("Dashboard initialized");
+    console.log("Dashboard initialized successfully");
 }
 
-// EVENT LISTENERS
+// EVENT LISTENERS 
 window.addEventListener('load', initDashboard);

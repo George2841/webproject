@@ -67,13 +67,6 @@ function displayUserInfo() {
     }
 }
 
-// Logout function
-function logout() {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userData');
-    localStorage.removeItem('authToken');
-    window.location.href = 'login.html';
-}
 
 // Initialize home page
 function initHomePage() {
@@ -150,7 +143,7 @@ function updateStudentInfo() {
         const eligibilityBadgeEl = document.getElementById('eligibilityBadge');
         
         if (studentNameEl) {
-            studentNameEl.textContent = "John Doe";
+            studentNameEl.textContent = "";
         }
         if (eligibilityBadgeEl) {
             eligibilityBadgeEl.textContent = "✓ Eligible";

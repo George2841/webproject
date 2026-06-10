@@ -3,7 +3,7 @@
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
     
-    // ========== CLOCK FUNCTIONALITY ==========
+    //CLOCK FUNCTIONALITY
     function updateClock() {
         var now = new Date();
         var hours = String(now.getHours()).padStart(2, '0');
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(updateClock, 1000);
     updateClock();
     
-    // ========== MOBILE MENU TOGGLE ==========
+    //MOBILE MENU TOGGLE
     window.toggleMenu = function() {
         var mobileMenu = document.getElementById('mobileMenu');
         if (mobileMenu) {
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // ========== GET DOM ELEMENTS ==========
+    //GET DOM ELEMENTS
     var regForm = document.getElementById('regForm');
     var firstName = document.getElementById('firstName');
     var lastName = document.getElementById('lastName');
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var registerBtn = document.getElementById('registerBtn');
     var successMessage = document.getElementById('successMessage');
     
-    // ========== VALIDATION FUNCTIONS ==========
+    //VALIDATION FUNCTIONS
     
     // Email validation using regex
     function validateEmail(email) {
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return nameRegex.test(name);
     }
     
-    // ========== ERROR HANDLING FUNCTIONS ==========
+    //ERROR HANDLING FUNCTIONS
     
     function showError(inputElement, errorElement, message) {
         if (inputElement) inputElement.classList.add('error');
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // ========== CLEAR ERRORS ON INPUT ==========
+    //CLEAR ERRORS ON INPUT
     
     function clearErrorOnInput(inputId, errorId) {
         var input = document.getElementById(inputId);
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
     clearErrorOnInput('faculty', 'facultyError');
     clearSelectError('yearOfStudy', 'yearError');
     
-    // ========== CHECK FOR DUPLICATE STUDENT ==========
+    //CHECK FOR DUPLICATE STUDENT
     function isDuplicateStudent(email, regNum) {
         var students = JSON.parse(localStorage.getItem('students') || '[]');
         for (var i = 0; i < students.length; i++) {
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return false;
     }
     
-    // ========== SAVE STUDENT DATA AND REDIRECT ==========
+    //SAVE STUDENT DATA AND REDIRECT
     function saveAndRedirect(studentData) {
         // Save temporary student data to localStorage
         localStorage.setItem('tempStudentData', JSON.stringify(studentData));
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1500);
     }
     
-    // ========== VALIDATE ENTIRE FORM ==========
+    //VALIDATE ENTIRE FORM
     function validateForm() {
         var isValid = true;
         
