@@ -46,36 +46,98 @@ document.addEventListener('DOMContentLoaded', function() {
     
     //DATABASE VERIFICATION FUNCTION
     
-    async function verifyStudentWithDatabase(regNumber, capturedImage) {
-        try {
-            var payload = {
-                regNumber: regNumber,
-                image: capturedImage
-            };
-            
-            console.log("Verifying student with database:", regNumber);
-            
-            var response = await fetch(API_BASE_URL + "/admin/verify/student", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload)
-            });
-            
-            var result = await response.json();
-            console.log("Database verification response:", result);
-            
-            if (response.ok && result.success) {
-                return { verified: true, student: result.student, message: result.message };
-            } else {
-                return { verified: false, message: result.message || "Student not found" };
-            }
-        } catch (error) {
-            console.error("Verification error:", error);
-            return { verified: false, message: "Network error. Please check your connection." };
-        }
+   async function verifyFaceWithDatabase() {
+
+    if (!currentStudent || !capturedImageData) {
+        return;
     }
+
+    try {
+
+        const token = localStorage.getItem("jwtToken");
+
+        if (!token) {
+            scanStatus.textContent = "Login Required";
+            scanStatus.className = "status-badge status-error";
+            return;
+        }
+
+        const payload = {
+            regNumber: currentStudent.regNumber,
+            image: capturedImageData
+        };
+
+        console.log("Face Verification Payload =", payload);
+
+        const response = await fetch(API_BASE_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        });
+
+        console.log("Response Status =", response.status);
+
+        const text = await response.text();
+
+        console.log("Backend Response =", text);
+
+        let result = {};
+
+        try {
+            result = text ? JSON.parse(text) : {};
+        } catch (e) {
+            console.log("Response is not JSON");
+        }
+
+        if (response.ok && result.success && result.match) {
+
+            scanStatus.textContent = "Verified ✓";
+            scanStatus.className = "status-badge status-success";
+
+            studentInfo.style.display = "flex";
+            eligibilityInfo.style.display = "flex";
+
+            studentNameSpan.textContent =
+                currentStudent.firstName +
+                " " +
+                currentStudent.lastName +
+                " (" +
+                currentStudent.regNumber +
+                ")";
+
+            eligibilityStatusSpan.textContent =
+                "Eligible - Examination Access Granted";
+
+            eligibilityStatusSpan.style.color = "#059669";
+
+            await markAttendance(currentStudent.regNumber);
+
+        } else {
+
+            scanStatus.textContent = "Face Verification Failed";
+            scanStatus.className = "status-badge status-error";
+
+            console.error("Verification Failed:", result);
+
+            setTimeout(function () {
+
+                scanStatus.textContent = "Ready to Scan";
+                scanStatus.className = "status-badge status-waiting";
+
+            }, 3000);
+        }
+
+    } catch (error) {
+
+        console.error("Face verification error:", error);
+
+        scanStatus.textContent = "Network Error";
+        scanStatus.className = "status-badge status-error";
+    }
+}
     
     //LOCAL STORAGE VERIFICATION
     function verifyStudentLocally(regNumber) {
