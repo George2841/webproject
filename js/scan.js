@@ -139,16 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 }
     
-    //LOCAL STORAGE VERIFICATION
-    function verifyStudentLocally(regNumber) {
-        var students = JSON.parse(localStorage.getItem('students') || '[]');
-        for (var i = 0; i < students.length; i++) {
-            if (students[i].regNumber === regNumber) {
-                return { verified: true, student: students[i] };
-            }
-        }
-        return { verified: false, message: "Student not found in local storage" };
-    }
+   
     
     //VERIFY STUDENT
     async function verifyStudent(regNumber) {
