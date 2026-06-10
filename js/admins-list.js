@@ -173,10 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var phoneNumber = admin.phoneNumber || 'N/A';
             var department = admin.department || 'N/A';
             var position = admin.position || 'N/A';
-            var status = admin.status || 'active';
-            var statusClass = status === 'active' ? 'status-active' : 'status-inactive';
-            var statusText = status === 'active' ? 'Active' : 'Inactive';
-            var regDate = admin.registrationDate ? new Date(admin.registrationDate).toLocaleDateString() : 'N/A';
+            var createdOn= admin.createdOn|| 'N/A';
             
             // Build the row HTML
             row.innerHTML = `
