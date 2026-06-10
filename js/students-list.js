@@ -45,54 +45,58 @@ document.addEventListener('DOMContentLoaded', function() {
     
     //  FETCH STUDENTS FROM DATABASE 
     async function fetchStudents() {
-        try {
-            var tbody = document.getElementById('studentsTableBody');
-            if (tbody) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Loading students from database...</td></tr>';
-            }
-            
-            var response = await fetch(API_BASE_URL + "/admin/get/all/students", {
+
+    const token = localStorage.getItem("jwtToken");
+
+    try {
+
+        var tbody = document.getElementById('studentsTableBody');
+
+        if (tbody) {
+            tbody.innerHTML =
+                '<tr><td colspan="9" style="text-align:center;">Loading students...</td></tr>';
+        }
+
+        const response = await fetch(
+            API_BASE_URL + "/admin/allStudents?page=0&size=10",
+            {
                 method: "GET",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
                 }
-            });
-            
-            var result = await response.json();
-            
-            if (response.ok && result.success && result.students && result.students.length > 0) {
-                allStudents = result.students;
-                console.log("Students loaded from database:", allStudents.length);
-            } else {
-                console.log("Database returned no students, checking localStorage...");
-                fetchFromLocalStorage();
             }
-            
-            renderStudents();
-            updateStatsSummary();
-            
-        } catch (error) {
-            console.error("Network error:", error);
-            fetchFromLocalStorage();
+        );
+
+        console.log("Status:", response.status);
+
+        if (!response.ok) {
+            throw new Error("Failed to load students");
         }
-    }
-    
-    //  FETCH FROM LOCAL STORAGE (FALLBACK) 
-    function fetchFromLocalStorage() {
-        var students = JSON.parse(localStorage.getItem('students') || '[]');
-        var tempStudent = JSON.parse(localStorage.getItem('tempStudentData') || 'null');
-        
-        if (tempStudent && !students.some(s => s.email === tempStudent.email)) {
-            students.push(tempStudent);
-        }
-        
-        allStudents = students;
-        console.log("Students loaded from localStorage:", allStudents.length);
-        
+
+        const result = await response.json();
+
+        console.log("Students from database:", result);
+
+        // Spring returns List<StudentResponse>
+        allStudents = result || [];
+
         renderStudents();
         updateStatsSummary();
+
+    } catch (error) {
+
+        console.error("Error loading students:", error);
+
+        var tbody = document.getElementById('studentsTableBody');
+
+        if (tbody) {
+            tbody.innerHTML =
+                '<tr><td colspan="9" style="text-align:center;color:red;">Failed to load students</td></tr>';
+        }
     }
-    
+}
+        
     //  GET FILTERED STUDENTS 
     function getFilteredStudents() {
         var filtered = allStudents;
@@ -185,14 +189,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             row.innerHTML = `
                 <td>${serialNumber}</td>
-                <td><strong>${escapeHtml(fullName)}</strong></td>
+                <td>${escapeHtml(fullName)}</strong></td>
                 <td>${escapeHtml(regNumber)}</td>
-                <td>${escapeHtml(email)}</td>
                 <td>${escapeHtml(department)}</td>
                 <td>${escapeHtml(yearOfStudy)}</td>
                 <td>${escapeHtml(faculty)}</td>
-                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                <td>${regDate}</td>
             `;
             tbody.appendChild(row);
         }
@@ -236,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 btn.classList.add('active');
                 currentFilter = btn.getAttribute('data-filter');
                 currentPage = 1;
-                renderStudents();
+                renderStudents(); //fuction being called 
             });
         });
     }

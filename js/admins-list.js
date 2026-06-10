@@ -55,21 +55,60 @@ document.addEventListener('DOMContentLoaded', function() {
     var rowsPerPage = 10;
     var searchTerm = '';
     
-    //  LOAD ADMINS FROM LOCALSTORAGE 
-    function loadAdmins() {
-        var savedAdmins = localStorage.getItem('admins');
-        
-        if (savedAdmins && JSON.parse(savedAdmins).length > 0) {
-            admins = JSON.parse(savedAdmins);
-            console.log("Admins loaded from localStorage:", admins.length);
-        } else {
-            addSampleAdmins();
+    //  LOAD ADMINS FROM Database
+     async function loadAdmins() {
+
+    const token = localStorage.getItem("jwtToken");
+
+    try {
+
+        var tbody = document.getElementById('adminsTableBody');
+
+        if (tbody) {
+            tbody.innerHTML =
+                '<tr><td colspan="9" style="text-align:center;">Loading students...</td></tr>';
         }
-        
-        updateStatsSummary();
-        renderAdminsTable();
+
+        const response = await fetch(
+            "http://localhost:8072/api/v1/admin/allAdmin?page=0&size=10",
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                }
+            }
+        );
+
+        console.log("Status:", response.status);
+
+        if (!response.ok) {
+            throw new Error("Failed to load Admins");
+        }
+            const result = await response.json();
+
+            console.log("Admins from database:", result);
+
+            admins = result || [];
+
+            console.log("Admins array:", admins);
+
+            renderAdminsTable();
+            updateStatsSummary();
+
+    } catch (error) {
+
+        console.error("Error loading Admins:", error);
+
+        var tbody = document.getElementById('adminsTableBody');
+
+        if (tbody) {
+            tbody.innerHTML =
+                '<tr><td colspan="9" style="text-align:center;color:red;">Failed to load students</td></tr>';
+        }
     }
-    
+
+}    
    
     
     // UPDATE STATS SUMMARY
@@ -154,14 +193,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             row.innerHTML = `
                 <td>${serialNumber}</td>
-                <td>${escapeHtml(employeeNumber)}</td>
                 <td><strong>${escapeHtml(fullName)}</strong></td>
-                <td>${escapeHtml(email)}</td>
+                <td>${escapeHtml(employeeNumber)}</td>
                 <td>${escapeHtml(phoneNumber)}</td>
                 <td>${escapeHtml(department)}</td>
                 <td>${escapeHtml(position)}</td>
-                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                <td>${regDate}</td>
+                <td>${escapeHtml(email)}</td>                                            
+                <td>${escapeHtml(createdOn)}</td>
                 <td class="action-buttons">
                     <button class="btn-delete" onclick="deleteAdmin(${admin.id})">Delete</button>
                 </td>

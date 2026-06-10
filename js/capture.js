@@ -1,3 +1,4 @@
+
 //CAPTURE PAGE JAVASCRIPT
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -153,48 +154,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // ========== SEND DATA TO BACKEND DATABASE ==========
-
- async function sendToDatabase(studentData, capturedImageData) {
-    try {
-
-        const token = localStorage.getItem("jwtToken");
-
-        console.log("JWT Token:", token);
-
-        if (!token) {
-            return {
-                success: false,
-                message: "JWT token not found. Please login again."
-            };
-        }
-
-        const payload = {
-            firstName: studentData.firstName,
-            lastName: studentData.lastName,
-            regNumber: studentData.regNumber,
-            studentEmail: studentData.email,
-            department: studentData.department,
-            faculty: studentData.faculty,
-            yearOfStudy: studentData.yearOfStudy,
-            image: capturedImageData
-        };
-
-        console.log("Sending data to database...");
-        console.log(payload);
-
-        
-    console.log("Token =", token);
-    console.log("URL =", "http://localhost:8072/api/v1/admin/create/student");
-    console.log("Payload =", payload);
-
-        const response = await fetch(
-            "http://localhost:8072/api/v1/admin/create/student",
-            {
-    //SEND DATA TO BACKEND DATABASE
     async function sendToDatabase(studentData, capturedImageData) {
         try {
-            // Prepare the payload for the API
-            var payload = {
+            const token = localStorage.getItem("jwtToken");
+
+            console.log("JWT Token:", token);
+
+            if (!token) {
+                return {
+                    success: false,
+                    message: "JWT token not found. Please login again."
+                };
+            }
+
+            const payload = {
                 firstName: studentData.firstName,
                 lastName: studentData.lastName,
                 regNumber: studentData.regNumber,
@@ -204,189 +177,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 yearOfStudy: studentData.yearOfStudy,
                 image: capturedImageData
             };
-            
-            console.log("Sending data to database:", payload);
-            
-            // Make API call to backend
-            var response = await fetch("http://localhost:8072/api/v1/admin/create/student", {
+
+            //this consoler log  for debugging
+            console.log("Sending data to database...");
+            console.log("Token =", token);
+            console.log("URL =", "http://localhost:8072/api/v1/admin/create/student");
+            console.log("Payload =", payload);
+
+            const response = await fetch("http://localhost:8072/api/v1/admin/create/student", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    "Authorization": "Bearer " + token
                 },
                 body: JSON.stringify(payload)
-            }
-        );
+            });
 
-        console.log("Response Status:", response.status);
-        console.log("Response OK:", response.ok);
+            const result = await response.json();
+            return result;
 
-        const text = await response.text();
-
-        console.log("Backend Response:", text);
-
-        if (response.ok) {
-            return {
-                success: true,
-                data: text
-            };
-        }
-
-        return {
-            success: false,
-            message: text || "Failed to save student"
-        };
-
-    } catch (error) {
-
-        console.error("FETCH ERROR:", error);
-
-        return {
-            success: false,
-            message: error.message
-        };
-    }
-}
-    
-    //SAVE TO LOCAL STORAGE (Backup)
-    function saveToLocalStorage(fullStudentData) {
-        try {
-            var students = JSON.parse(localStorage.getItem('students') || '[]');
-            
-            // Check if student already exists
-            var existingIndex = -1;
-            for (var i = 0; i < students.length; i++) {
-                if (students[i].email === fullStudentData.email) {
-                    existingIndex = i;
-                    break;
-                }
-            }
-            
-            if (existingIndex >= 0) {
-                students[existingIndex] = fullStudentData;
-            } else {
-                students.push(fullStudentData);
-            }
-            
-            localStorage.setItem('students', JSON.stringify(students));
-            
-            // Create user session
-            var userSession = {
-                email: fullStudentData.email,
-                name: fullStudentData.firstName + ' ' + fullStudentData.lastName,
-                regNumber: fullStudentData.regNumber,
-                role: 'student',
-                loginTime: new Date().toISOString(),
-                hasFaceImage: true
-            };
-            localStorage.setItem('currentUser', JSON.stringify(userSession));
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.removeItem('tempStudentData');
-            
-            return true;
         } catch (error) {
-            console.error("LocalStorage error:", error);
-            return false;
+            console.error("Database submission error:", error);
+            return { success: false, message: "An error occurred while saving to database." };
         }
     }
-    
-    //SHOW SUCCESS POPUP THEN REDIRECT TO HOME
-    function showSuccessPopupAndRedirect() {
-        // Show the success overlay popup
-        if (successOverlay) {
-            successOverlay.classList.add('show');
-        }
-        
-        // Wait 3 seconds for user to see the success message
-        setTimeout(function() {
-            // Redirect to home page (index.html)
-            window.location.href = 'index.html';
-        }, 3000);
-    }
-    
-    //COMPLETE REGISTRATION
-    async function completeRegistration() {
-        if (!capturedImageData) {
-            showMessage('Please capture your face first!', 'error');
-            return;
-        }
-        
-        if (finishBtn) {
-            finishBtn.disabled = true;
-            finishBtn.textContent = 'Processing...';
-        }
-        
-        showMessage('Saving registration to database...', 'info');
-        
-        try {
-            // Send data to Backend Database ====
-            var dbResult = await sendToDatabase(studentData, capturedImageData);
-            
-            if (dbResult.success) {
-                console.log("Database save successful:", dbResult);
-                
-                //Save to Local Storage as backup
-                var fullStudentData = {
-                    firstName: studentData.firstName,
-                    lastName: studentData.lastName,
-                    regNumber: studentData.regNumber,
-                    email: studentData.email,
-                    department: studentData.department,
-                    yearOfStudy: studentData.yearOfStudy,
-                    faculty: studentData.faculty,
-                    faceImage: capturedImageData,
-                    registrationDate: new Date().toISOString(),
-                    status: 'active',
-                    syncedToDatabase: true,
-                    databaseId: dbResult.data?.id || null
-                };
-                
-                saveToLocalStorage(fullStudentData);
-                
-                // Stop camera
-                if (stream) {
-                    stream.getTracks().forEach(function(track) { track.stop(); });
-                }
-                
-                // Show success popup and redirect to home
-                showSuccessPopupAndRedirect();
-                
-            } else {
-                // Database save failed
-                console.error("Database save failed:", dbResult.message);
-                showMessage(dbResult.message + " - Please check your connection.", 'error');
-                
-                if (finishBtn) {
-                    finishBtn.disabled = false;
-                    finishBtn.textContent = 'Finish Registration';
-                }
-            }
-            
-        } catch (error) {
-            console.error('Registration error:', error);
-            showMessage('Error saving registration. Please check your internet connection.', 'error');
-            if (finishBtn) {
-                finishBtn.disabled = false;
-                finishBtn.textContent = 'Finish Registration';
-            }
-        }
-    }
-    
-    //EVENT LISTENERS
-    if (capturePhotoBtn) capturePhotoBtn.addEventListener('click', capturePhoto);
-    if (retakeBtn) retakeBtn.addEventListener('click', retakePhoto);
-    if (finishBtn) finishBtn.addEventListener('click', completeRegistration);
-    if (manualCaptureBtn) manualCaptureBtn.addEventListener('click', capturePhoto);
-    
-    //INITIALIZE
-    if (loadStudentData()) {
-        initCamera();
-    }
-    
-    // Clean up
-    window.addEventListener('beforeunload', function() {
-        if (stream) {
-            stream.getTracks().forEach(function(track) { track.stop(); });
-        }
-    });
 });
