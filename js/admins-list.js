@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     
-    // 3. DOM ELEMENTS - Get references to all HTML elements we'll need
+    // DOM ELEMENTS - Get references to all HTML elements we'll need
     
     var adminsTableBody = document.getElementById('adminsTableBody');  // Table body where admins are listed
     var searchInput = document.getElementById('searchInput');          // Search box input field

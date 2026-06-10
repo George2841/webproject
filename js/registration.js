@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Data saved to localStorage:', studentData);
         
         // Show success message
-        showSuccessMessage('✅ Registration details saved! Redirecting to face capture...');
+        showSuccessMessage('Registration details saved! Redirecting to face capture...');
         
         // Disable button to prevent multiple clicks
         if (registerBtn) {

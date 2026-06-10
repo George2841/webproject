@@ -1,10 +1,10 @@
-//FACE CAPTURE PAGE JAVASCRIPT 
+// ========== FACE CAPTURE PAGE JAVASCRIPT ==========
 // This file handles camera access, face capture, and sending data to the backend
 
 document.addEventListener('DOMContentLoaded', function() {
     
     
-    // CLOCK FUNCTION - Shows live time in navigation bar
+    // 1. CLOCK FUNCTION - Shows live time in navigation bar
     
     function updateClock() {
         var now = new Date();
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Variables to store data
     var stream = null;              // Camera stream
-    var capturedImageData = null;   //image data after capture
+    var capturedImageData = null;   // Base64 image data after capture
     var studentData = null;         // Student information from registration
     
     
