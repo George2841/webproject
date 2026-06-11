@@ -85,11 +85,11 @@ document.addEventListener('DOMContentLoaded', function() {
             var token = localStorage.getItem('jwtToken') || localStorage.getItem('authToken');
             
             // Prepare the API endpoint with optional search parameter
-            var url = API_BASE_URL + "/admin/get/all/admins";
+            var url = API_BASE_URL + "/admin/get/allAdmin";
             
             // If there's a search term, add it to the URL
             if (searchTerm.trim() !== '') {
-                url = API_BASE_URL + "/admin/search/admins?search=" + encodeURIComponent(searchTerm);
+                url = API_BASE_URL + "/admin/get/" + encodeURIComponent(searchTerm);
             }
             
             console.log("Fetching admins from:", url);
@@ -214,10 +214,9 @@ document.addEventListener('DOMContentLoaded', function() {
             var email = admin.email || 'N/A';
             var phoneNumber = admin.phoneNumber || admin.phone || 'N/A';
             var department = admin.department || 'N/A';
-<<<<<<< HEAD
+
             var position = admin.position || 'N/A';
             var createdOn= admin.createdOn|| 'N/A';
-=======
             var position = admin.position || admin.role || 'N/A';
             var status = admin.status || 'active';
             var statusClass = (status === 'active' || status === 'ACTIVE') ? 'status-active' : 'status-inactive';
@@ -232,7 +231,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     regDate = 'N/A';
                 }
             }
->>>>>>> dd195b0abaf4315ecc5783dcfef3381d3e3a437e
             
             // Build the row HTML
             row.innerHTML = `
@@ -352,7 +350,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     window.deleteAdmin = async function(id) {
         // Ask for confirmation before deleting
-        var userConfirmed = confirm('⚠️ Are you sure you want to delete this administrator? This action cannot be undone.');
+        var userConfirmed = confirm('Are you sure you want to delete this administrator? This action cannot be undone.');
         
         if (!userConfirmed) return;
         

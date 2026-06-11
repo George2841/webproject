@@ -203,15 +203,19 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             console.log("Response Status:", response.status);
+
+            var result = await response.text();
+            console.log(result);
             
-            var result = await response.json();
             console.log("Backend Response:", result);
-            
-            if (response.ok && result.success) {
-                return { success: true, data: result, message: "Student registered successfully!" };
-            } else {
-                return { success: false, message: result.message || "Failed to save student to database" };
-            }
+
+            if (response.ok) {
+                return {
+                    success: true,
+                    message: result
+                };
+            }           
+
             
         } catch (error) {
             console.error("Network Error:", error);
