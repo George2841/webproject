@@ -256,37 +256,37 @@ document.addEventListener('DOMContentLoaded', function () {
                 responseText
             );
 
-            if (!response.ok) {
+           if (!response.ok) {
 
-                scanStatus.textContent =
-                    "Verification Failed";
+    scanStatus.textContent = "Verification Failed";
+    scanStatus.className = "status-badge status-error";
 
-                scanStatus.className =
-                    "status-badge status-error";
+    return;
+}
+
+            if (responseText.includes("Eligible to sit for exam")) {
+
+                scanStatus.textContent = "Verified ✓";
+                scanStatus.className = "status-badge status-success";
+
+                studentInfo.style.display = "flex";
+                eligibilityInfo.style.display = "flex";
+
+                studentNameSpan.textContent = currentRegNumber;
+
+                eligibilityStatusSpan.textContent =
+                    "Eligible - Examination Access Granted";
+
+                eligibilityStatusSpan.style.color = "#059669";
+
+            } else {
+
+                scanStatus.textContent = "Face Not Recognized! Not Eligible to do Exam";
+                scanStatus.className = "status-badge status-error";
 
                 studentInfo.style.display = "none";
                 eligibilityInfo.style.display = "none";
-
-                return;
             }
-
-            scanStatus.textContent =
-                "Verified ✓";
-
-            scanStatus.className =
-                "status-badge status-success";
-
-            studentInfo.style.display = "flex";
-            eligibilityInfo.style.display = "flex";
-
-            studentNameSpan.textContent =
-                currentRegNumber;
-
-            eligibilityStatusSpan.textContent =
-                "Eligible - Examination Access Granted";
-
-            eligibilityStatusSpan.style.color =
-                "#059669";
 
         } catch (error) {
 
