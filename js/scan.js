@@ -1,5 +1,79 @@
 // SCAN PAGE JAVASCRIPT
 
+// checks authentication before allowing you to access scan page
+function checkAuthentication() {
+
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    const jwtToken = localStorage.getItem("jwtToken");
+
+    if (
+        !isLoggedIn ||
+        isLoggedIn !== "true" ||
+        !jwtToken
+    ) {
+        window.location.href = "login.html";
+        return false;
+    }
+
+    return true;
+}
+
+// LOGOUT
+function logout() {
+
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("jwtToken");
+    localStorage.removeItem("email");
+    localStorage.removeItem("currentUser");
+
+    window.location.href = "login.html";
+}
+
+//this fuction validate token if it expired or not
+async function validateToken() {
+
+    const token = localStorage.getItem("jwtToken");
+
+    if (!token) {
+        window.location.href = "login.html";
+        return false;
+    }
+
+    //when there is token, this fetch function sends the token to be validated in backend to check if is not expired 
+    // and if is aready expired, you are redirected to login page
+    try {
+
+        const response = await fetch(
+            "http://localhost:8072/api/v1/auth/validate",
+            {
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            }
+        );
+
+        //if response from backend ids not ok, meaning token is expired, that token get cleared from local storage and 
+        // you get redirected to login page
+        if (!response.ok) {
+
+            localStorage.clear();
+            window.location.href = "login.html";
+
+            return false;
+        }
+
+        return true;
+
+    } catch (error) {
+
+        localStorage.clear();
+        window.location.href = "login.html";
+
+        return false;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
 
     // CLOCK FUNCTIONALITY
@@ -94,6 +168,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // CAMERA INITIALIZATION
     async function initCamera() {
+
+        
+    // Prevent unauthorized access
+    if (!checkAuthentication()) {
+        return;
+    }
 
         try {
 
