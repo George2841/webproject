@@ -1,6 +1,53 @@
 // This page handles face capture as part of student registration
 // The student data comes from the registration page, we just add the face image and send everything to the database
 
+//this fuction validate token if is expired or not
+async function validateToken() {
+
+    const token = localStorage.getItem("jwtToken");
+
+    if (!token) {
+        window.location.href = "login.html";
+        return false;
+    }
+
+    //when there is token, this fetch function sends the token to be validated in backend to check if is not expired 
+    // and if is aready expired, you are redirected to login page
+    try {
+
+        const response = await fetch(
+            "http://localhost:8072/api/v1/auth/validate",
+            {
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            }
+        );
+
+        //if response from backend is not ok, meaning token is expired, that token get cleared from local storage and 
+        // you get redirected to login page
+        if (!response.ok) {
+
+            localStorage.clear();
+            window.location.href = "login.html";
+
+            return false;
+        }
+
+        return true;
+
+    } catch (error) {
+
+        localStorage.clear();
+        window.location.href = "login.html";
+
+        return false;
+    }
+}
+
+validateToken();
+
 document.addEventListener('DOMContentLoaded', function() {
 
     // Live clock in the navigation bar - updates every second
