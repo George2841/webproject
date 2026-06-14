@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var token = localStorage.getItem('jwtToken') || localStorage.getItem('authToken');
             
             // Prepare the API endpoint with optional search parameter
-            var url = API_BASE_URL + "/admin/get/allAdmin";
+            var url = API_BASE_URL + "/admin/allAdmin";
             
             // If there's a search term, add it to the URL
             if (searchTerm.trim() !== '') {
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error("Error fetching admins from database:", error);
             // Show error message in the table
             if (adminsTableBody) {
-                adminsTableBody.innerHTML = '<tr><td colspan="10" style="text-align: center;">❌ Error loading administrators. Please check your connection.</td></tr>';
+                adminsTableBody.innerHTML = '<tr><td colspan="10" style="text-align: center;"> Error loading administrators. Please check your connection.</td></tr>';
             }
             showToast("Failed to load administrators from database", "error");
             admins = [];  // Reset to empty array on error
@@ -259,11 +259,11 @@ document.addEventListener('DOMContentLoaded', function() {
             var serialNumber = start + i + 1;
             var fullName = (admin.firstName || admin.first_name || '') + ' ' + (admin.lastName || admin.last_name || '');
             var employeeNumber = admin.employeeNumber || admin.employee_number || admin.staffId || 'N/A';
-            var email = admin.email || 'N/A';
             var phoneNumber = admin.phoneNumber || admin.phone || 'N/A';
             var department = admin.department || 'N/A';
+            var email = admin.email || 'N/A';
 
-            var position = admin.position || 'N/A';
+            // var position = admin.position || 'N/A';
             var createdOn= admin.createdOn|| 'N/A';
             var position = admin.position || admin.role || 'N/A';
             var status = admin.status || 'active';
@@ -290,9 +290,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td>${escapeHtml(department)}</td>
                 <td>${escapeHtml(position)}</td>
                 <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                <td>${regDate}</td>
                 <td class="action-buttons">
-                    <button class="btn-delete" onclick="deleteAdmin('${admin.id || admin._id}')">🗑️ Delete</button>
+                    <button class="btn-delete"
+                            onclick="deleteAdmin('${employeeNumber}')">
+                          Delete
+                    </button>
                 </td>
             `;
             adminsTableBody.appendChild(row);
@@ -396,46 +398,80 @@ document.addEventListener('DOMContentLoaded', function() {
     
     //  DELETE ADMIN - Remove an admin from the database
     
-    window.deleteAdmin = async function(id) {
-        // Ask for confirmation before deleting
-        var userConfirmed = confirm('Are you sure you want to delete this administrator? This action cannot be undone.');
-        
-        if (!userConfirmed) return;
-        
-        try {
-            // Get the authentication token
-            var token = localStorage.getItem('jwtToken') || localStorage.getItem('authToken');
-            
-            // Show loading state on the delete button
-            showToast('Deleting administrator...', 'info');
-            
-            // Make API call to delete the admin
-            var response = await fetch(API_BASE_URL + "/admin/delete/" + id, {
+// DELETE ADMIN - Remove an admin from the database
+window.deleteAdmin = async function(employeeNumber) {
+
+    if (!employeeNumber || employeeNumber === 'N/A') {
+        showToast('Invalid employee number.', 'error');
+        return;
+    }
+
+    var userConfirmed = confirm(
+        'Are you sure you want to delete administrator ' +
+        employeeNumber +
+        '? This action cannot be undone.'
+    );
+
+    if (!userConfirmed) {
+        return;
+    }
+
+    try {
+
+        var token =
+            localStorage.getItem('jwtToken') ||
+            localStorage.getItem('authToken');
+
+        showToast('Deleting administrator...', 'info');
+
+        console.log(
+            "Deleting admin:",
+            API_BASE_URL + "/admin/delete/admin/" + employeeNumber
+        );
+
+        var response = await fetch(
+            API_BASE_URL + "/admin/delete/admin/" + employeeNumber,
+            {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": token ? "Bearer " + token : ""
                 }
-            });
-            
-            if (!response.ok) {
-                throw new Error("Failed to delete admin: " + response.status);
             }
-            
-            var result = await response.json();
-            console.log("Delete response:", result);
-            
-            // Refresh the admin list from database
-            await fetchAdminsFromDatabase();
-            
-            showToast('Admin deleted successfully!', 'success');
-            
-        } catch (error) {
-            console.error("Error deleting admin:", error);
-            showToast('Failed to delete admin. Please try again.', 'error');
+        );
+
+        if (!response.ok) {
+            var errorText = await response.text();
+            throw new Error(
+                "Failed to delete admin: " +
+                response.status +
+                " - " +
+                errorText
+            );
         }
-    };
-    
+
+        var result = await response.text();
+
+        console.log("Delete successful:", result);
+
+        showToast(
+            "Administrator deleted successfully!",
+            "success"
+        );
+
+        await fetchAdminsFromDatabase();
+
+    } catch (error) {
+
+        console.error("Error deleting admin:", error);
+
+        showToast(
+            "Failed to delete administrator. " +
+            error.message,
+            "error"
+        );
+    }
+};    
     // TOAST NOTIFICATION - Show temporary popup messages
     function showToast(message, type) {
         // Remove any existing toast to avoid duplicates
