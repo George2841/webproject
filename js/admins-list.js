@@ -214,6 +214,10 @@ document.addEventListener('DOMContentLoaded', function() {
             var email = admin.email || 'N/A';
             var phoneNumber = admin.phoneNumber || admin.phone || 'N/A';
             var department = admin.department || 'N/A';
+<<<<<<< HEAD
+            var position = admin.position || 'N/A';
+            var createdOn= admin.createdOn|| 'N/A';
+=======
             var position = admin.position || admin.role || 'N/A';
             var status = admin.status || 'active';
             var statusClass = (status === 'active' || status === 'ACTIVE') ? 'status-active' : 'status-inactive';
@@ -228,6 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     regDate = 'N/A';
                 }
             }
+>>>>>>> dd195b0abaf4315ecc5783dcfef3381d3e3a437e
             
             // Build the row HTML
             row.innerHTML = `
