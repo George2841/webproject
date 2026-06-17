@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP - Student Facial Recognition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/verify-otp.css">
+</head>
+<body>
+    <div class="login-card">
+        <div class="logo-icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 13c-2.33 0-4.31-1.46-5.11-3.5h10.22c-.8 2.04-2.78 3.5-5.11 3.5z"/>
+            </svg>
+        </div>
+        <h2>Verify OTP</h2>
+        <p class="subtitle">Enter the 6-digit OTP sent to your email</p>
+        
+        <div class="success-message" id="successMessage">
+            ✅ OTP verified! Redirecting to reset password...
+        </div>
+        
+        <div class="error-message" id="errorMessage">
+            ❌ Invalid OTP. Please try again.
+        </div>
+
+        <form id="verifyOtpForm">
+            <div class="form-group">
+                <label for="otp">Enter OTP Code</label>
+                <input type="text" id="otp" placeholder="Enter 6-digit OTP" maxlength="6" required>
+                <div class="error-msg" id="otpError">Please enter a valid 6-digit OTP</div>
+            </div>
+            
+            <div class="resend-container">
+                <p>Didn't receive OTP? <a href="#" id="resendOtp">Resend OTP</a></p>
+            </div>
+            
+            <button type="submit" class="btn-submit" id="verifyOtpBtn">Verify OTP</button>
+            <a href="reset-password.html" class="btn-back">← Back</a>
+        </form>
+    </div>
+
+    <script src="js/verify-otp.js"></script>
+</body>
+</html>

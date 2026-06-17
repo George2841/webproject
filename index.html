@@ -19,7 +19,8 @@
        <!-- Nav right -->
          <div class="nav-right">
              <span class="nav-time" id="navClock">--:--:--</span>
-             <a href="scan.html" class="btn btn-primary btn-sm">Get Started</a>
+             <button id="logoutBtn" class="btn-logout">Logout</button>
+             
          </div>
        <!-- Mobile hamburger -->
            <button class="hamburger" id="hamburger" onclick="toggleMenu()">
@@ -32,8 +33,8 @@
          <a href="index.html"     class="mobile-link active">Home</a>
          <a href="scan.html"      class="mobile-link">Face Scan</a>
          <a href="dashboard.html" class="mobile-link">Dashboard</a>
+         <a href="#" id="mobileLogoutBtn" style="color: #ef4444;">Logout</a>
          
-         <a href="scan.html"      class="btn btn-primary" style="margin-top:8px">Get Started</a>
      </div>
   
     </nav>
@@ -99,5 +100,6 @@
     </div>
   </footer>
 <script src="js/home.js"></script>
+<script src="js/logout.js"></script>
 </body>
 </html>
