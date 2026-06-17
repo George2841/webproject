@@ -74,7 +74,7 @@ resetForm.addEventListener('submit', async function(event) {
                 sessionStorage.setItem('resetToken', result.token);
             }
             
-            successMessage.textContent = 'OTP sent successfully! Check your email.';
+            successMessage.textContent = '✅ OTP sent successfully! Check your email.';
             
             sendOtpBtn.disabled = false;
             sendOtpBtn.textContent = 'Send OTP';
@@ -86,7 +86,7 @@ resetForm.addEventListener('submit', async function(event) {
             
         } else {
             // Something went wrong - email not found or other error
-            errorMessage.textContent = result.message || 'Email not found. Please check and try again.';
+            errorMessage.textContent = result.message || '❌ Email not found. Please check and try again.';
             errorMessage.classList.add('show');
             
             sendOtpBtn.disabled = false;
