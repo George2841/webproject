@@ -3,28 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Reset Password - Student Facial Recognition</title>
     <link rel="stylesheet" href="css/login.css">
+    
 </head>
 <body>
     <div class="login-card">
-        <h2>Reset Password</h2>
-    <p>A reset Password link will be sent to your email</p>
-    <form class="loginForm">
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input type="email" id="email" placeholder="you@example.com" />
-        </div>
         
-        <button>Send reset link</button>
-        <a href="login.html" class="btn-login">Back to Login</a>
-    </form>
-
+        <h2>Reset Password</h2>
+        <p class="subtitle">Enter your email address and we'll send you an OTP to reset your password</p>
+        
+        <form id="resetForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="you@example.com" required>
+                <div class="error-msg" id="emailError">Please enter email address</div>
+            </div>
+            
+            <button type="submit" class="btn-submit" id="sendOtpBtn">Send OTP</button>
+            <a href="login.html" class="btn-back">← Back to Login</a>
+        </form>
     </div>
+
+    <script src="js/reset.js"></script>
 </body>
 </html>
-
-
-
-
-
