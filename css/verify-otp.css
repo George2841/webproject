@@ -1,7 +1,3 @@
-/* =============================================
-   VERIFY OTP PAGE STYLES
-   ============================================= */
-
 * {
     margin: 0;
     padding: 0;
@@ -208,7 +204,6 @@ h2 {
     text-decoration: underline;
 }
 
-/* Responsive */
 @media (max-width: 480px) {
     .login-card {
         padding: 25px;
