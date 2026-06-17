@@ -283,12 +283,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // Build the row HTML
             row.innerHTML = `
                 <td>${serialNumber}</td>
-                <td>${escapeHtml(employeeNumber)}</td>
                 <td><strong>${escapeHtml(fullName)}</strong></td>
-                <td>${escapeHtml(email)}</td>
+                <td>${escapeHtml(employeeNumber)}</td>
                 <td>${escapeHtml(phoneNumber)}</td>
                 <td>${escapeHtml(department)}</td>
                 <td>${escapeHtml(position)}</td>
+                <td>${escapeHtml(email)}</td>
                 <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                 <td class="action-buttons">
                     <button class="btn-delete"
