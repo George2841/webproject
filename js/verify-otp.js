@@ -41,7 +41,7 @@ verifyForm.addEventListener('submit', async function(event) {
     errorMessage.classList.remove('show');
     
     try {
-        const response = await fetch(API_BASE_URL + '/auth/verify-otp', {
+        const response = await fetch(API_BASE_URL + '/auth/verify-otp/'+ otp, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -57,7 +57,7 @@ verifyForm.addEventListener('submit', async function(event) {
         
         if (response.ok && result.success) {
             successMessage.classList.add('show');
-            successMessage.textContent = '✅ OTP verified! Redirecting to reset password...';
+            successMessage.textContent = ' OTP verified! Redirecting to reset password...';
             
             if (result.token) {
                 sessionStorage.setItem('resetToken', result.token);
@@ -71,7 +71,7 @@ verifyForm.addEventListener('submit', async function(event) {
             }, 2500);
             
         } else {
-            errorMessage.textContent = result.message || '❌ Invalid OTP. Please try again.';
+            errorMessage.textContent = result.message || ' Invalid OTP. Please try again.';
             errorMessage.classList.add('show');
             otpInput.classList.add('error');
             verifyOtpBtn.disabled = false;
@@ -80,7 +80,7 @@ verifyForm.addEventListener('submit', async function(event) {
         
     } catch (error) {
         console.error('Network error:', error);
-        errorMessage.textContent = '❌ Network error. Please check your connection.';
+        errorMessage.textContent = ' Network error. Please check your connection.';
         errorMessage.classList.add('show');
         verifyOtpBtn.disabled = false;
         verifyOtpBtn.textContent = 'Verify OTP';
@@ -105,16 +105,16 @@ resendLink.addEventListener('click', async function(event) {
         const result = await response.json();
         
         if (response.ok && result.success) {
-            successMessage.textContent = '✅ New OTP sent to your email!';
+            successMessage.textContent = ' New OTP sent to your email!';
             successMessage.classList.add('show');
             errorMessage.classList.remove('show');
         } else {
-            errorMessage.textContent = result.message || '❌ Failed to send OTP. Please try again.';
+            errorMessage.textContent = result.message || 'Failed to send OTP. Please try again.';
             errorMessage.classList.add('show');
         }
         
     } catch (error) {
-        errorMessage.textContent = '❌ Network error. Please try again.';
+        errorMessage.textContent = ' Network error. Please try again.';
         errorMessage.classList.add('show');
     }
     

@@ -49,36 +49,49 @@ resetForm.addEventListener('submit', async function(event) {
             body: JSON.stringify({ email: email })
         });
         
-        const result = await response.json();
-        console.log('Backend response:', result);
         
-        if (response.ok && result.success) {
-            successMessage.classList.add('show');
-            sessionStorage.setItem('resetEmail', email);
-            
-            if (result.token) {
-                sessionStorage.setItem('resetToken', result.token);
+            const result = await response.text();
+            console.log('Backend response:', result);
+
+            if (response.ok) {
+
+                sessionStorage.setItem('resetEmail', email);
+
+                successMessage.textContent = result;
+                successMessage.classList.add('show');
+
+                sendOtpBtn.disabled = false;
+                sendOtpBtn.textContent = 'Send OTP';
+
+                // Redirect to verify page after 2 seconds
+                setTimeout(() => {
+                    window.location.href = "verify-otp.html";
+                }, 2000);
+
+            } else {
+
+            let errorMsg = 'Email not found. Please check and try again.';
+
+            try {
+                const errorResponse = JSON.parse(result);
+
+                if (errorResponse.message) {
+                    errorMsg = errorResponse.message;
+                }
+            } catch (e) {
+                errorMsg = result || errorMsg;
             }
-            
-            successMessage.textContent = '✅ OTP sent successfully! Check your email.';
-            
-            sendOtpBtn.disabled = false;
-            sendOtpBtn.textContent = 'Send OTP';
-            
-            setTimeout(function() {
-                window.location.href = 'verify-otp.html';
-            }, 2500);
-            
-        } else {
-            errorMessage.textContent = result.message || '❌ Email not found. Please check and try again.';
+
+            errorMessage.textContent = errorMsg;
             errorMessage.classList.add('show');
+
             sendOtpBtn.disabled = false;
             sendOtpBtn.textContent = 'Send OTP';
         }
         
     } catch (error) {
         console.error('Network error:', error);
-        errorMessage.textContent = '❌ Network error. Please check your internet connection.';
+        errorMessage.textContent = ' Network error. Please check your internet connection.';
         errorMessage.classList.add('show');
         sendOtpBtn.disabled = false;
         sendOtpBtn.textContent = 'Send OTP';
